@@ -414,7 +414,8 @@ you risk downtime.
 What would break if removed
    # Why broader access is forbidden
     
-    Principle of Least Privilege
+   Broader access to AWS Secrets Manager is forbidden to enforce least-privilege access control, preventing unauthorized entities
+   from retrieving sensitive credentials via GetSecretValue API calls.
     
    # Why this role exists
     
