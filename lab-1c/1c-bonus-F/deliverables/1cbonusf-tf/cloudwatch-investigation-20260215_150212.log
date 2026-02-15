@@ -1,0 +1,102 @@
+=========================================
+CloudWatch Logs Investigation Report
+Project: thedawgs2025.click
+Date: Sun Feb 15 15:02:12 CST 2026
+=========================================
+
+Time Range: Last 2 hours
+
+[STEP 1] Analyzing WAF logs...
+
+✓ Found 78 WAF events
+
+=========================================
+WAF ANALYSIS
+=========================================
+
+Actions:
+  ✓ ALLOW: 75 requests
+  ⚠️  BLOCK: 6 requests
+
+Top Client IPs:
+   24 requests - 176.65.148.161
+    9 requests - 185.16.39.146
+    8 requests - 62.210.198.129
+    6 requests - 204.76.203.219
+    4 requests - 162.142.125.116
+    3 requests - 205.210.31.149
+    3 requests - 204.76.203.206
+    3 requests - 167.94.138.40
+    2 requests - 3.22.224.215
+    2 requests - 217.160.202.182
+
+Top Requested URIs:
+   55 - /
+    8 - /_next
+    4 - /favicon.ico
+    2 - /robots.txt
+    1 - /sitemap.xml
+    1 - /security.txt
+    1 - /list
+    1 - /favicon.ico/sellers.json
+    1 - /favicon.ico/app-ads.txt
+    1 - /favicon.ico/ads.txt
+    1 - /evox/about
+    1 - /device.rsp
+    1 - /.well-known/security.txt
+
+=========================================
+⚠️  BLOCKED REQUESTS (ATTACK DETECTED)
+=========================================
+
+Blocked IPs and URIs:
+  Blocked IPs:
+    • 3.22.224.215
+    • 90.220.183.251
+
+  Blocked URIs:
+    • /
+    • /device.rsp
+    • /evox/about
+
+Blocking Rules:
+  3 blocks by: AWSManagedRulesCommonRuleSet
+
+Suspicious Activity Detected:
+  ✓ No common attack patterns detected
+
+Recent WAF Events (Last 10):
+  (Unable to parse events)
+
+=========================================
+[STEP 2] Analyzing App logs...
+=========================================
+
+✓ Found 0 app log events
+
+Log Summary:
+  Total entries: 0
+  ✓ Errors: 0
+
+=========================================
+[STEP 3] Infrastructure Health
+=========================================
+
+✓ Application: Responding (HTTP 200)
+
+=========================================
+INCIDENT ANALYSIS
+=========================================
+
+🚨 ACTIVE ATTACK DETECTED
+
+   • WAF blocked 6 malicious requests
+   • Review blocked IPs and URIs above
+   • Consider adding rate limiting rules
+
+=========================================
+Investigation Complete!
+=========================================
+
+Full report saved to: cloudwatch-investigation-20260215_150212.log
+

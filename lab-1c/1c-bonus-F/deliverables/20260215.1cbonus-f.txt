@@ -1,0 +1,242 @@
+#20260215.1cbonus-f.md
+
+app_url_http = "http://app.thedawgs2025.click"
+app_url_https = "https://app.thedawgs2025.click"
+app_urls = {
+  "alb_direct" = "http://lab-alb01-1309351751.us-east-1.elb.amazonaws.com"
+  "http" = "http://app.thedawgs2025.click"
+  "https" = "https://app.thedawgs2025.click"
+}
+base_domain = "thedawgs2025.click"
+dawgs-armageddon_acm_cert_arn = "arn:aws:acm:us-east-1:778185677715:certificate/78309e48-6105-41fe-8a7c-90952590a004"
+dawgs-armageddon_alb_dns_name = "lab-alb01-1309351751.us-east-1.elb.amazonaws.com"
+dawgs-armageddon_apex_url_https = "https://thedawgs2025.click"
+dawgs-armageddon_dashboard_name = "lab-dashboard01"
+dawgs-armageddon_ec2_instance_id = "i-078564ced6cc8d92c"
+dawgs-armageddon_ec2_private_instance_id = "i-088f7c248dfb6671b"
+dawgs-armageddon_log_group_name = "/aws/ec2/lab-rds-app"
+dawgs-armageddon_private_subnet_ids = [
+  "subnet-021beae0faf909670",
+  "subnet-0d818afa81a468344",
+]
+dawgs-armageddon_public_subnet_ids = [
+  "subnet-037dd9dd6feb80c69",
+  "subnet-01002642ff3abb3b3",
+]
+dawgs-armageddon_rds_endpoint = "lab-rds01.c89ykq22i31z.us-east-1.rds.amazonaws.com"
+dawgs-armageddon_sns_topic_arn = "arn:aws:sns:us-east-1:778185677715:lab-db-incidents"
+dawgs-armageddon_target_group_arn = "arn:aws:elasticloadbalancing:us-east-1:778185677715:targetgroup/lab-tg01/62904db801ee9132"
+dawgs-armageddon_vpc_id = "vpc-07ed04e968f9ad29b"
+dawgs-armageddon_waf_arn = "arn:aws:wafv2:us-east-1:778185677715:regional/webacl/lab-waf01/171b70df-f0d7-403d-bbb2-bc1d12e6c243"
+dawgs-armageddon_waf_log_destination = "cloudwatch"
+lb_url = "http://lab-alb01-1309351751.us-east-1.elb.amazonaws.com"
+
+
+curl -I "app.thedawgs2025.click"
+HTTP/1.1 301 Moved Permanently
+Server: awselb/2.0
+Date: Sun, 15 Feb 2026 18:03:25 GMT
+Content-Type: text/html
+Content-Length: 134
+Connection: keep-alive
+Location: https://app.thedawgs2025.click:443/
+
+ curl -I "thedawgs2025.click"
+HTTP/1.1 301 Moved Permanently
+Server: awselb/2.0
+Date: Sun, 15 Feb 2026 18:03:44 GMT
+Content-Type: text/html
+Content-Length: 134
+Connection: keep-alive
+Location: https://thedawgs2025.click:443/
+
+WAF log group: aws-waf-logs-lab-webacl01
+  App log group: /aws/ec2/lab-rds-app
+
+
+=== Running Gate 1/2: secrets_and_role ===
+
+=== SEIR Gate: Secrets + EC2 Role Verification ===
+Timestamp (UTC): 2026-02-15T20:45:07Z
+Region:          us-east-1
+Instance ID:     i-078564ced6cc8d92c
+Secret ID:       lab/rds/mysql
+Resolved Role:   lab-ec2-role01
+Caller ARN:      arn:aws:iam::778185677715:user/awscli
+-----------------------------------------------
+PASS: aws sts get-caller-identity succeeded (credentials OK).
+PASS: secret exists and is describable (lab/rds/mysql).
+INFO: rotation requirement disabled (REQUIRE_ROTATION=false).
+PASS: no resource policy found (OK) or not applicable (lab/rds/mysql).
+PASS: instance has IAM instance profile attached (i-078564ced6cc8d92c).
+PASS: resolved instance profile -> role (lab-instance-profile01 -> lab-ec2-role01).
+INFO: EXPECTED_ROLE_NAME not set; using resolved role (lab-ec2-role01).
+INFO: on-instance checks skipped (not running as expected role on EC2).
+
+Warnings:
+  - WARN: current caller ARN is not assumed-role/lab-ec2-role01 (you may be running off-instance).
+
+RESULT: PASS
+===============================================
+
+Wrote: gate_result.json
+=== Running Gate 2/2: network_db ===
+
+=== SEIR Gate: Network + RDS Verification ===
+Timestamp (UTC): 2026-02-15T20:45:38Z
+Region:          us-east-1
+EC2 Instance:    i-078564ced6cc8d92c
+RDS Instance:    lab-rds01
+Engine:          mysql
+DB Port:         3306
+Caller ARN:      arn:aws:iam::778185677715:user/awscli
+-------------------------------------------
+PASS: aws sts get-caller-identity succeeded (credentials OK).
+PASS: RDS instance exists (lab-rds01).
+PASS: RDS is not publicly accessible (PubliclyAccessible=False).
+INFO: using DB_PORT override = 3306.
+PASS: EC2 security groups resolved (i-078564ced6cc8d92c): sg-088ab7950b8ea817f
+PASS: RDS security groups resolved (lab-rds01): sg-0b7ecb2d997f619fd
+PASS: RDS SG allows DB port 3306 from EC2 SG (SG-to-SG ingress present).
+INFO: private subnet check disabled (CHECK_PRIVATE_SUBNETS=false).
+
+RESULT: PASS
+===========================================
+
+Wrote: gate_result.json
+
+
+{
+  "gate": "network_db",
+  "timestamp_utc": "2026-02-15T20:45:39Z",
+  "region": "us-east-1",
+  "instance_id": "i-078564ced6cc8d92c",
+  "db_id": "lab-rds01",
+  "engine": "mysql",
+  "db_port": "3306",
+  "publicly_accessible": "False",
+  "ec2_security_groups": "sg-088ab7950b8ea817f",
+  "rds_security_groups": "sg-0b7ecb2d997f619fd",
+  "db_subnet_group": "lab-rds-subnet-group01",
+  "toggles": {
+    "check_private_subnets": false
+  },
+  "status": "PASS",
+  "exit_code": 0,
+  "details": [
+"PASS: aws sts get-caller-identity succeeded (credentials OK).\nPASS: RDS instance exists (lab-rds01).\nPASS: RDS is not publicly accessible (PubliclyAccessible=False).\nINFO: using DB_PORT override = 3306.\nPASS: EC2 security groups resolved (i-078564ced6cc8d92c): sg-088ab7950b8ea817f\nPASS: RDS security groups resolved (lab-rds01): sg-0b7ecb2d997f619fd\nPASS: RDS SG allows DB port 3306 from EC2 SG (SG-to-SG ingress present).\nINFO: private subnet check disabled (CHECK_PRIVATE_SUBNETS=false)."],
+  "warnings": [],
+  "failures": []
+}
+
+
+
+Query Pack:
+
+=========================================
+CloudWatch Logs Investigation Report
+Project: thedawgs2025.click
+Date: Sun Feb 15 15:02:12 CST 2026
+=========================================
+
+Time Range: Last 2 hours
+
+[STEP 1] Analyzing WAF logs...
+
+✓ Found 78 WAF events
+
+=========================================
+WAF ANALYSIS
+=========================================
+
+Actions:
+  ✓ ALLOW: 75 requests
+  ⚠️  BLOCK: 6 requests
+
+Top Client IPs:
+   24 requests - 176.65.148.161
+    9 requests - 185.16.39.146
+    8 requests - 62.210.198.129
+    6 requests - 204.76.203.219
+    4 requests - 162.142.125.116
+    3 requests - 205.210.31.149
+    3 requests - 204.76.203.206
+    3 requests - 167.94.138.40
+    2 requests - 3.22.224.215
+    2 requests - 217.160.202.182
+
+Top Requested URIs:
+   55 - /
+    8 - /_next
+    4 - /favicon.ico
+    2 - /robots.txt
+    1 - /sitemap.xml
+    1 - /security.txt
+    1 - /list
+    1 - /favicon.ico/sellers.json
+    1 - /favicon.ico/app-ads.txt
+    1 - /favicon.ico/ads.txt
+    1 - /evox/about
+    1 - /device.rsp
+    1 - /.well-known/security.txt
+
+=========================================
+⚠️  BLOCKED REQUESTS (ATTACK DETECTED)
+=========================================
+
+Blocked IPs and URIs:
+  Blocked IPs:
+    • 3.22.224.215
+    • 90.220.183.251
+
+  Blocked URIs:
+    • /
+    • /device.rsp
+    • /evox/about
+
+Blocking Rules:
+  3 blocks by: AWSManagedRulesCommonRuleSet
+
+Suspicious Activity Detected:
+  ✓ No common attack patterns detected
+
+Recent WAF Events (Last 10):
+  (Unable to parse events)
+
+=========================================
+[STEP 2] Analyzing App logs...
+=========================================
+
+✓ Found 0 app log events
+
+Log Summary:
+  Total entries: 0
+  ✓ Errors: 0
+
+=========================================
+[STEP 3] Infrastructure Health
+=========================================
+
+✓ Application: Responding (HTTP 200)
+
+=========================================
+INCIDENT ANALYSIS
+=========================================
+
+🚨 ACTIVE ATTACK DETECTED
+
+   • WAF blocked 6 malicious requests
+   • Review blocked IPs and URIs above
+   • Consider adding rate limiting rules
+
+=========================================
+Investigation Complete!
+=========================================
+
+Full report saved to: cloudwatch-investigation-20260215_150212.log
+
+
+
+
+
+

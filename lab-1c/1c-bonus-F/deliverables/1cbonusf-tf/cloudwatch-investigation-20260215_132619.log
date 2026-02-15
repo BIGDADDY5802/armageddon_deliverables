@@ -1,0 +1,110 @@
+=========================================
+CloudWatch Logs Investigation Report
+Project: thedawgs2025.click
+Date: Sun Feb 15 13:26:19 CST 2026
+=========================================
+
+Time Range: Last 2 hours
+
+[STEP 1] Analyzing WAF logs...
+
+✓ Found 179 WAF events
+
+=========================================
+WAF ANALYSIS
+=========================================
+
+Actions:
+  ✓ ALLOW: 137 requests
+  ⚠️  BLOCK: 84 requests
+
+Top Client IPs:
+   59 requests - 176.65.148.161
+   14 requests - 81.29.142.100
+   10 requests - 81.29.142.6
+    9 requests - 185.16.39.146
+    5 requests - 96.41.38.202
+    4 requests - 54.205.54.19
+    4 requests - 54.158.49.56
+    4 requests - 52.53.164.73
+    4 requests - 51.44.180.231
+    4 requests - 44.200.195.170
+
+Top Requested URIs:
+  118 - /
+   20 - /.git/HEAD
+   18 - /_next
+   13 - /favicon.ico
+    3 - /robots.txt
+    1 - /list
+    1 - /init
+    1 - /add
+    1 - /@vite/env
+    1 - /.vscode/sftp.json
+    1 - /.git/config
+    1 - /.env
+
+=========================================
+⚠️  BLOCKED REQUESTS (ATTACK DETECTED)
+=========================================
+
+Blocked IPs and URIs:
+  Blocked IPs:
+    • 13.220.196.161
+    • 13.41.230.83
+    • 20.46.246.132
+    • 20.64.105.68
+    • 3.91.214.212
+    • 35.158.125.253
+    • 35.176.135.219
+    • 44.200.195.170
+    • 51.44.180.231
+    • 52.53.164.73
+    • 54.158.49.56
+    • 54.205.54.19
+
+  Blocked URIs:
+    • /
+    • /.git/HEAD
+
+Blocking Rules:
+  42 blocks by: AWSManagedRulesCommonRuleSet
+
+Suspicious Activity Detected:
+  ⚠️  1 .env file scans
+
+Recent WAF Events (Last 10):
+  (Unable to parse events)
+
+=========================================
+[STEP 2] Analyzing App logs...
+=========================================
+
+✓ Found 2 app log events
+
+Log Summary:
+  Total entries: 2
+  ✓ Errors: 0
+
+=========================================
+[STEP 3] Infrastructure Health
+=========================================
+
+✓ Application: Responding (HTTP 200)
+
+=========================================
+INCIDENT ANALYSIS
+=========================================
+
+🚨 ACTIVE ATTACK DETECTED
+
+   • WAF blocked 84 malicious requests
+   • Review blocked IPs and URIs above
+   • Consider adding rate limiting rules
+
+=========================================
+Investigation Complete!
+=========================================
+
+Full report saved to: cloudwatch-investigation-20260215_132619.log
+
