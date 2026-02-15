@@ -236,7 +236,9 @@ Investigation Complete!
 Full report saved to: cloudwatch-investigation-20260215_150212.log
 
 
+aws s3 rm s3://lab-alb-logs-778185677715 --recursive
 
+aws s3 ls s3://lab-alb-logs-778185677715/
+# Should return nothing
 
-
-
+aws s3 rb s3://lab-alb-logs-778185677715 --force
