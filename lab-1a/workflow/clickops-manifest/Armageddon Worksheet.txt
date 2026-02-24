@@ -30,11 +30,6 @@ create instance:
 -	use Armageddon user_data.sh copy raw > Paste in user data
 -	Create Instance 3.238.149.70
 
-```bash
-aws ec2 run-instances --image-id 'ami-068c0051b15cdb816'\ 
---instance-type 't3.micro' --key-name 'armageddon-lab-1'\ 
---user-data 'IyEvYmluL2Jhc2gKZG5mIHVwZGF0ZSAteQpkbmYgaW5zdGFsbCAteSBweXRob24zLXBpcApwaXAzIGluc3RhbGwgZmxhc2sgcHlteXNxbCBib3RvMwpkbmYgaW5zdGFsbCBtYXJpYWRiMTA1IC15Cgpta2RpciAtcCAvb3B0L3Jkc2FwcApjYXQgPi9vcHQvcmRzYXBwL2FwcC5weSA8PCdQWScKaW1wb3J0IGpzb24KaW1wb3J0IG9zCmltcG9ydCBib3RvMwppbXBvcnQgcHlteXNxbApmcm9tIGZsYXNrIGltcG9ydCBGbGFzaywgcmVxdWVzdAoKUkVHSU9OID0gb3MuZW52aXJvbi5nZXQoIkFXU19SRUdJT04iLCAidXMtZWFzdC0xIikKU0VDUkVUX0lEID0gb3MuZW52aXJvbi5nZXQoIlNFQ1JFVF9JRCIsICJsYWIvcmRzL215c3FsLzIiKQoKc2VjcmV0cyA9IGJvdG8zLmNsaWVudCgic2VjcmV0c21hbmFnZXIiLCByZWdpb25fbmFtZT1SRUdJT04pCgpkZWYgZ2V0X2RiX2NyZWRzKCk6CiAgICByZXNwID0gc2VjcmV0cy5nZXRfc2VjcmV0X3ZhbHVlKFNlY3JldElkPVNFQ1JFVF9JRCkKICAgIHMgPSBqc29uLmxvYWRzKHJlc3BbIlNlY3JldFN0cmluZyJdKQogICAgIyBXaGVuIHlvdSB1c2UgIkNyZWRlbnRpYWxzIGZvciBSRFMgZGF0YWJhc2UiLCBBV1MgdXN1YWxseSBzdG9yZXM6CiAgICAjIHVzZXJuYW1lLCBwYXNzd29yZCwgaG9zdCwgcG9ydCwgZGJuYW1lIChzb21ldGltZXMpCiAgICByZXR1cm4gcwoKZGVmIGdldF9jb25uKCk6CiAgICBjID0gZ2V0X2RiX2NyZWRzKCkKICAgIGhvc3QgPSBjWyJob3N0Il0KICAgIHVzZXIgPSBjWyJ1c2VybmFtZSJdCiAgICBwYXNzd29yZCA9IGNbInBhc3N3b3JkIl0KICAgIHBvcnQgPSBpbnQoYy5nZXQoInBvcnQiLCAzMzA2KSkKICAgIGRiID0gYy5nZXQoImRibmFtZSIsICJsYWJkYiIpICAjIHdlJ2xsIGNyZWF0ZSB0aGlzIGlmIGl0IGRvZXNuJ3QgZXhpc3QKICAgIHJldHVybiBweW15c3FsLmNvbm5lY3QoaG9zdD1ob3N0LCB1c2VyPXVzZXIsIHBhc3N3b3JkPXBhc3N3b3JkLCBwb3J0PXBvcnQsIGRhdGFiYXNlPWRiLCBhdXRvY29tbWl0PVRydWUpCgphcHAgPSBGbGFzayhfX25hbWVfXykKCkBhcHAucm91dGUoIi8iKQpkZWYgaG9tZSgpOgogICAgcmV0dXJuICIiIgogICAgPGgyPkRBV0dTIEVDMiDihpIgUkRTIE5vdGVzIEFwcDwvaDI+CiAgICA8cD5QT1NUIC9hZGQ/bm90ZT1oZWxsbzwvcD4KICAgIDxwPkdFVCAvbGlzdDwvcD4KICAgICIiIgoKQGFwcC5yb3V0ZSgiL2luaXQiKQpkZWYgaW5pdF9kYigpOgogICAgYyA9IGdldF9kYl9jcmVkcygpCiAgICBob3N0ID0gY1siaG9zdCJdCiAgICB1c2VyID0gY1sidXNlcm5hbWUiXQogICAgcGFzc3dvcmQgPSBjWyJwYXNzd29yZCJdCiAgICBwb3J0ID0gaW50KGMuZ2V0KCJwb3J0IiwgMzMwNikpCgogICAgIyBjb25uZWN0IHdpdGhvdXQgc3BlY2lmeWluZyBhIERCIGZpcnN0CiAgICBjb25uID0gcHlteXNxbC5jb25uZWN0KGhvc3Q9aG9zdCwgdXNlcj11c2VyLCBwYXNzd29yZD1wYXNzd29yZCwgcG9ydD1wb3J0LCBhdXRvY29tbWl0PVRydWUpCiAgICBjdXIgPSBjb25uLmN1cnNvcigpCiAgICBjdXIuZXhlY3V0ZSgiQ1JFQVRFIERBVEFCQVNFIElGIE5PVCBFWElTVFMgbGFiZGI7IikKICAgIGN1ci5leGVjdXRlKCJVU0UgbGFiZGI7IikKICAgIGN1ci5leGVjdXRlKCIiIgogICAgICAgIENSRUFURSBUQUJMRSBJRiBOT1QgRVhJU1RTIG5vdGVzICgKICAgICAgICAgICAgaWQgSU5UIEFVVE9fSU5DUkVNRU5UIFBSSU1BUlkgS0VZLAogICAgICAgICAgICBub3RlIFZBUkNIQVIoMjU1KSBOT1QgTlVMTAogICAgICAgICk7CiAgICAiIiIpCiAgICBjdXIuY2xvc2UoKQogICAgY29ubi5jbG9zZSgpCiAgICByZXR1cm4gIkluaXRpYWxpemVkIGxhYmRiICsgbm90ZXMgdGFibGUuIgoKQGFwcC5yb3V0ZSgiL2FkZCIsIG1ldGhvZHM9WyJQT1NUIiwgIkdFVCJdKQpkZWYgYWRkX25vdGUoKToKICAgIG5vdGUgPSByZXF1ZXN0LmFyZ3MuZ2V0KCJub3RlIiwgIiIpLnN0cmlwKCkKICAgIGlmIG5vdCBub3RlOgogICAgICAgIHJldHVybiAiTWlzc2luZyBub3RlIHBhcmFtLiBUcnk6IC9hZGQ/bm90ZT1oZWxsbyIsIDQwMAogICAgY29ubiA9IGdldF9jb25uKCkKICAgIGN1ciA9IGNvbm4uY3Vyc29yKCkKICAgIGN1ci5leGVjdXRlKCJJTlNFUlQgSU5UTyBub3Rlcyhub3RlKSBWQUxVRVMoJXMpOyIsIChub3RlLCkpCiAgICBjdXIuY2xvc2UoKQogICAgY29ubi5jbG9zZSgpCiAgICByZXR1cm4gZiJJbnNlcnRlZCBub3RlOiB7bm90ZX0iCgpAYXBwLnJvdXRlKCIvbGlzdCIpCmRlZiBsaXN0X25vdGVzKCk6CiAgICBjb25uID0gZ2V0X2Nvbm4oKQogICAgY3VyID0gY29ubi5jdXJzb3IoKQogICAgY3VyLmV4ZWN1dGUoIlNFTEVDVCBpZCwgbm90ZSBGUk9NIG5vdGVzIE9SREVSIEJZIGlkIERFU0M7IikKICAgIHJvd3MgPSBjdXIuZmV0Y2hhbGwoKQogICAgY3VyLmNsb3NlKCkKICAgIGNvbm4uY2xvc2UoKQogICAgb3V0ID0gIjxoMz5Ob3RlczwvaDM+PHVsPiIKICAgIGZvciByIGluIHJvd3M6CiAgICAgICAgb3V0ICs9IGYiPGxpPntyWzBdfToge3JbMV19PC9saT4iCiAgICBvdXQgKz0gIjwvdWw+IgogICAgcmV0dXJuIG91dAoKaWYgX19uYW1lX18gPT0gIl9fbWFpbl9fIjoKICAgIGFwcC5ydW4oaG9zdD0iMC4wLjAuMCIsIHBvcnQ9ODApClBZCgpjYXQgPi9ldGMvc3lzdGVtZC9zeXN0ZW0vcmRzYXBwLnNlcnZpY2UgPDwnU0VSVklDRScKW1VuaXRdCkRlc2NyaXB0aW9uPUVDMiB0byBSRFMgTm90ZXMgQXBwCkFmdGVyPW5ldHdvcmsudGFyZ2V0CgpbU2VydmljZV0KV29ya2luZ0RpcmVjdG9yeT0vb3B0L3Jkc2FwcApFbnZpcm9ubWVudD1TRUNSRVRfSUQ9bGFiL3Jkcy9teXNxbC8yCkV4ZWNTdGFydD0vdXNyL2Jpbi9weXRob24zIC9vcHQvcmRzYXBwL2FwcC5weQpSZXN0YXJ0PWFsd2F5cwoKW0luc3RhbGxdCldhbnRlZEJ5PW11bHRpLXVzZXIudGFyZ2V0ClNFUlZJQ0UKCnN5c3RlbWN0bCBkYWVtb24tcmVsb2FkCnN5c3RlbWN0bCBlbmFibGUgcmRzYXBwCnN5c3RlbWN0bCBzdGFydCByZHNhcHA=' --network-interfaces '{"SubnetId":"subnet-0a4e490cc0756ab8a","AssociatePublicIpAddress":true,"DeviceIndex":0,"Groups":["sg-0e52d0e08f8349b49"]}' --credit-specification '{"CpuCredits":"unlimited"}' --tag-specifications '{"ResourceType":"instance","Tags":[{"Key":"Name","Value":"lab-ec2-app"}]}' --metadata-options '{"HttpEndpoint":"enabled","HttpPutResponseHopLimit":2,"HttpTokens":"required"}' --private-dns-name-options '{"HostnameType":"ip-name","EnableResourceNameDnsARecord":false,"EnableResourceNameDnsAAAARecord":false}' --count '1' 
-```
 
 Create IAM role for instance to access database:
 -	Custom Trust Policy
@@ -89,71 +84,13 @@ alias/aws/rds}
 
 -	Note: Has to be at least 2 AZs to create Aurora MySQL Database Databases are managed
 
-```bash
-aws ec2 describe-security-groups --max-results '1000' 
-aws ec2 create-subnet --tag-specifications '{"ResourceType":"subnet","Tags":[{"Key":"Name","Value":"RDS-Pvt-subnet-2"}]}' --vpc-id 'vpc-0707f3739f7f3db68' --cidr-block '10.190.3.0/25' --availability-zone-id 'use1-az5' 
-aws ec2 create-subnet --tag-specifications '{"ResourceType":"subnet","Tags":[{"Key":"Name","Value":"RDS-Pvt-subnet-1"}]}' --vpc-id 'vpc-0707f3739f7f3db68' --cidr-block '10.190.0.128/25' --availability-zone-id 'use1-az1' 
-aws ec2 create-subnet --tag-specifications '{"ResourceType":"subnet","Tags":[{"Key":"Name","Value":"RDS-Pvt-subnet-5"}]}' --vpc-id 'vpc-0707f3739f7f3db68' --cidr-block '10.190.4.128/25' --availability-zone-id 'use1-az3' 
-aws ec2 create-subnet --tag-specifications '{"ResourceType":"subnet","Tags":[{"Key":"Name","Value":"RDS-Pvt-subnet-4"}]}' --vpc-id 'vpc-0707f3739f7f3db68' --cidr-block '10.190.4.0/25' --availability-zone-id 'use1-az6' 
-aws ec2 create-subnet --tag-specifications '{"ResourceType":"subnet","Tags":[{"Key":"Name","Value":"RDS-Pvt-subnet-3"}]}' --vpc-id 'vpc-0707f3739f7f3db68' --cidr-block '10.190.3.128/25' --availability-zone-id 'use1-az2' 
-aws ec2 create-security-group --group-name 'rds-ec2-1' --description 'Security group attached to labmysql to allow EC2 instances with specific security groups attached to connect to the database. Modification could lead to connection loss.' --vpc-id 'vpc-0707f3739f7f3db68' 
-aws ec2 create-security-group --group-name 'ec2-rds-1' --description 'Security group attached to instances to securely connect to labmysql. Modification could lead to connection loss.' --vpc-id 'vpc-0707f3739f7f3db68' 
-aws ec2 authorize-security-group-ingress --group-id 'sg-08d3a4970b1fc3cc6' --ip-permissions '{"FromPort":3306,"ToPort":3306,"IpProtocol":"tcp","UserIdGroupPairs":[{"Description":"Rule to allow connections from EC2 instances with sg-035a80eadd1126f61 attached","GroupId":"sg-035a80eadd1126f61"}]}' 
-aws ec2 authorize-security-group-egress --group-id 'sg-035a80eadd1126f61' --ip-permissions '{"FromPort":3306,"ToPort":3306,"IpProtocol":"tcp","UserIdGroupPairs":[{"Description":"Rule to allow connections to labmysql from any instances this security group is attached to","GroupId":"sg-08d3a4970b1fc3cc6"}]}' 
-aws ec2 revoke-security-group-egress --group-id 'sg-08d3a4970b1fc3cc6' --ip-permissions '{"FromPort":0,"ToPort":0,"IpProtocol":"all","IpRanges":[{"CidrIp":"0.0.0.0/0"}]}' 
-aws ec2 revoke-security-group-egress --group-id 'sg-035a80eadd1126f61' --ip-permissions '{"FromPort":0,"ToPort":0,"IpProtocol":"all","IpRanges":[{"CidrIp":"0.0.0.0/0"}]}' 
-aws ec2 describe-network-interfaces --filters '{"Name":"attachment.instance-id","Values":["instance-id-here"]}' 
-aws ec2 modify-network-interface-attribute --network-interface-id 'eni-07b484f4bff0d022c' --groups 'sg-0e52d0e08f8349b49' 'sg-035a80eadd1126f61' 
-aws ec2 create-route-table --vpc-id 'vpc-0707f3739f7f3db68' --tag-specifications '{"ResourceType":"route-table","Tags":[{"Key":"Name","Value":"RDS-Pvt-rt"}]}' 
-aws ec2 associate-route-table --route-table-id 'rtb-063d9e5dd9c74f227' --subnet-id 'subnet-09ba63c50b2783e3f' 
-aws ec2 associate-route-table --route-table-id 'rtb-063d9e5dd9c74f227' --subnet-id 'subnet-05c2461ba6968d367' 
-aws ec2 associate-route-table --route-table-id 'rtb-063d9e5dd9c74f227' --subnet-id 'subnet-084b4b4df9c90d689' 
-aws ec2 associate-route-table --route-table-id 'rtb-063d9e5dd9c74f227' --subnet-id 'subnet-01be566fb8c9c8250' 
-aws ec2 associate-route-table --route-table-id 'rtb-063d9e5dd9c74f227' --subnet-id 'subnet-090846c78cb7bf35c' 
-aws rds create-db-subnet-group --db-subnet-group-name 'rds-ec2-db-subnet-group-1' --db-subnet-group-description 'Created from the RDS Management Console' --subnet-ids 'subnet-05c2461ba6968d367' 'subnet-09ba63c50b2783e3f' 'subnet-01be566fb8c9c8250' 'subnet-084b4b4df9c90d689' 'subnet-090846c78cb7bf35c' 
-aws ec2 describe-security-groups --filters '{"Name":"group-name","Values":["rds-sg"]}' '{"Name":"vpc-id","Values":["vpc-0707f3739f7f3db68"]}' --max-results '1000' 
-aws ec2 create-security-group --group-name 'rds-sg' --description 'Created by RDS management console' --vpc-id 'vpc-0707f3739f7f3db68' 
-aws ec2 authorize-security-group-ingress --group-id 'sg-03834df5926e24e1d' --cidr-ip '35.135.236.158/32' --ip-protocol 'tcp' --from-port '3306' --to-port '3306' 
-aws rds create-db-instance --engine 'mysql' --engine-version '8.0.43' --engine-lifecycle-support 'open-source-rds-extended-support-disabled' --db-instance-identifier 'labmysql' --master-username 'admin' --db-instance-class 'db.t4g.micro' --db-subnet-group-name 'rds-ec2-db-subnet-group-1' --db-name '' --character-set-name 'null' --nchar-character-set-name 'null' --vpc-security-group-ids 'sg-08d3a4970b1fc3cc6' 'sg-03834df5926e24e1d' --db-security-groups 'null' --availability-zone 'us-east-1a' --port '3306' --storage-type 'gp2' --allocated-storage '20' --iops 'null' --storage-throughput 'null' --kms-key-id 'null' --enable-cloudwatch-logs-exports 'audit' 'error' 'general' 'iam-db-auth-error' 'slowquery' --preferred-maintenance-window 'null' --preferred-backup-window 'null' --backup-retention-period '1' --monitoring-interval '0' --domain 'null' --domain-iam-role-name 'null' --domain-fqdn 'null' --domain-ou 'null' --domain-auth-secret-arn 'null' --domain-dns-ips 'null' --db-parameter-group-name 'default.mysql8.0' --option-group-name 'default:mysql-8-0' --timezone 'null' --processor-features 'null' --max-allocated-storage '1000' --network-type 'null' --backup-target 'null' --ca-certificate-identifier 'rds-ca-rsa2048-g1' --tags '{"Key":"name","Value":"labmysql"}' --master-user-password 'DawgsRDSPass123' 
-aws rds describe-db-instances --filters '{"Name":"db-instance-id","Values":["labmysql"]}' 
-aws rds describe-db-instances  
-aws rds describe-db-clusters  
-aws rds describe-db-recommendations --filters '{"Name":"status","Values":["active"]}' --locale 'en' --last-updated-after '"2025-10-07T05:44:18.566Z"' 
-aws rds describe-db-instances  
-aws rds describe-db-clusters  
-aws rds describe-blue-green-deployments  
-aws rds describe-global-clusters  
-aws rds describe-tenant-databases  
-aws ec2 describe-subnets --max-results '1000' 
-aws rds describe-pending-maintenance-actions  
-aws guardduty list-detectors  
-aws ec2 describe-security-groups --max-results '1000' 
-aws cloudwatch describe-alarms-for-metric --metric-name 'CPUUtilization' --namespace 'AWS/RDS' 
-aws rds describe-db-recommendations --filters '{"Name":"status","Values":["active"]}' --locale 'en' --last-updated-after '"2025-10-07T05:44:19.450Z"' 
-aws cloudwatch get-metric-data --start-time '"2026-01-05T05:38:19.804Z"' --end-time '"2026-01-05T05:44:19.804Z"' --metric-data-queries '{"Id":"m0","Label":"arn:aws:rds:us-east-1:778185677715:db:labmysql_CPUUtilization","MetricStat":{"Period":60,"Stat":"Average","Metric":{"Namespace":"AWS/RDS","Dimensions":[{"Name":"DBInstanceIdentifier","Value":"labmysql"}],"MetricName":"CPUUtilization"}}}' '{"Id":"m1","Label":"arn:aws:rds:us-east-1:778185677715:db:labmysql_DatabaseConnections","MetricStat":{"Period":60,"Stat":"Average","Metric":{"Namespace":"AWS/RDS","Dimensions":[{"Name":"DBInstanceIdentifier","Value":"labmysql"}],"MetricName":"DatabaseConnections"}}}' '{"Id":"m2","Label":"arn:aws:rds:us-east-1:778185677715:db:labmysql_DBLoad","MetricStat":{"Period":60,"Stat":"Average","Metric":{"Namespace":"AWS/RDS","Dimensions":[{"Name":"DBInstanceIdentifier","Value":"labmysql"}],"MetricName":"DBLoad"}}}' '{"Id":"m3","Label":"arn:aws:rds:us-east-1:778185677715:db:labmysql_AuroraReplicaLag","MetricStat":{"Period":60,"Stat":"Average","Metric":{"Namespace":"AWS/RDS","Dimensions":[{"Name":"DBInstanceIdentifier","Value":"labmysql"}],"MetricName":"AuroraReplicaLag"}}}' '{"Id":"m4","Label":"arn:aws:rds:us-east-1:778185677715:db:labmysql_AuroraBinlogReplicaLag","MetricStat":{"Period":60,"Stat":"Average","Metric":{"Namespace":"AWS/RDS","Dimensions":[{"Name":"DBInstanceIdentifier","Value":"labmysql"}],"MetricName":"AuroraBinlogReplicaLag"}}}' '{"Id":"m5","Label":"arn:aws:rds:us-east-1:778185677715:db:labmysql_OldestReplicationSlotLag","MetricStat":{"Period":60,"Stat":"Average","Metric":{"Namespace":"AWS/RDS","Dimensions":[{"Name":"DBInstanceIdentifier","Value":"labmysql"}],"MetricName":"OldestReplicationSlotLag"}}}' '{"Id":"m6","Label":"arn:aws:rds:us-east-1:778185677715:db:labmysql_OldestLogicalReplicationSlotLag","MetricStat":{"Period":60,"Stat":"Average","Metric":{"Namespace":"AWS/RDS","Dimensions":[{"Name":"DBInstanceIdentifier","Value":"labmysql"}],"MetricName":"OldestLogicalReplicationSlotLag"}}}' 
-aws rds describe-db-instances --filters '{"Name":"db-instance-id","Values":["labmysql"]}' 
-```
 
 destroy database:
 ```bash
 aws rds delete-db-instance --db-instance-identifier\
 'labmysql' --final-db-snapshot-identifier 'labmysql-snapshot' 
 ```
-Snapshots:
-```
-aws rds delete-db-instance --db-instance-identifier 'labmysql' --final-db-snapshot-identifier 'labmysql-snapshot' 
-aws rds describe-export-tasks --marker 'null' 
-aws rds describe-db-snapshot-tenant-databases  
-aws rds describe-db-cluster-snapshots --snapshot-type 'manual' 
-aws rds describe-db-snapshots --snapshot-type 'manual' 
-aws rds describe-db-snapshot-tenant-databases  
-aws rds delete-db-snapshot --db-snapshot-identifier 'lab-mysql-2-snapshot' 
-aws rds delete-db-snapshot --db-snapshot-identifier 'lab-mysql-snapshot' 
-aws rds describe-db-snapshots --snapshot-type 'manual' 
-aws rds describe-db-cluster-snapshots --snapshot-type 'manual' 
-aws rds describe-db-snapshots --snapshot-type 'manual' 
-aws rds describe-db-cluster-snapshots --snapshot-type 'manual' 
-```
+
 
 secrets manager: 
 -	credentials for Amazon RDS Database

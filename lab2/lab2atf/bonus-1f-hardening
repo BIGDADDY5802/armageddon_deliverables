@@ -1,0 +1,48 @@
+Update Todos
+
+Create bonus_f_query_definitions.tf with all A1-A8 and B1-B4 saved query definitions
+
+Create run_insights.sh on-demand runner script
+
+
+Create bonus_f_query_definitions.tf with all A1-A8 and B1-B4 saved query definitions
+
+Create run_insights.sh on-demand runner script
+
+199 lines
+Bash Make run_insights.sh executable
+IN
+chmod +x /c/Users/Jerome/Documents/TheoWAF/class7/AWS/Terraform/armageddon-lab1c-bf/1cbonusf-tf/run_insights.sh
+
+OUT
+0
+Update Todos
+
+Create bonus_f_query_definitions.tf with all A1-A8 and B1-B4 saved query definitions
+
+Create run_insights.sh on-demand runner script
+Two files created:
+
+bonus_f_query_definitions.tf
+Deploys all 12 queries as Saved Queries in the CloudWatch console (Logs > Insights > Saved Queries). After terraform apply they appear folder-grouped as:
+
+
+lab/WAF/A1-Top-Actions
+lab/WAF/A2-Top-Client-IPs
+...
+lab/App/B1-Error-Rate-Over-Time
+...
+WAF queries gate on var.waf_log_destination == "cloudwatch" via for_each — they won't be created if you're using S3 or Firehose.
+
+run_insights.sh — the "prompt to run" part
+Uses aws logs start-query + polls get-query-results to actually execute the queries and print results. This is what complete_inv.sh does with filter-log-events, but with Logs Insights queries (more powerful — aggregations, stats, bin(), case()).
+
+
+./run_insights.sh                    # last 15 min, all queries
+./run_insights.sh --minutes 60       # expand window
+./run_insights.sh --query waf        # WAF only
+./run_insights.sh --query app        # App only
+./run_insights.sh --project myname   # if your project_name isn't "lab"
+Output is printed to terminal and saved to insights-<timestamp>.log.
+
+Workflow: terraform apply once to wire the saved queries → ./run_insights.sh whenever you want to run them at incident time.
