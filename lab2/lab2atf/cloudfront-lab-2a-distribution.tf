@@ -165,7 +165,7 @@ resource "aws_cloudfront_distribution" "dawgs-armageddon_cf01" {
   comment             = "${var.project_name} Lab 2A distribution"
   http_version        = var.cloudfront_http_version
   price_class         = var.cloudfront_price_class
-  aliases             = [local.cf_fqdn]
+  aliases             = [local.cf_fqdn, var.domain_name]
   wait_for_deployment = false # Don't block terraform apply; use outputs to check status
 
   # ── Origin: ALB ────────────────────────────────────────────────────────
@@ -190,9 +190,10 @@ resource "aws_cloudfront_distribution" "dawgs-armageddon_cf01" {
     # The ALB listener rule checks for this exact value.
     # If the header is missing or wrong, the ALB returns 403.
     # This stops anyone who tries to bypass CloudFront and go direct.
+    # random_password is the source of truth — ALB listener rule references the same resource.
     custom_header {
       name  = var.cloudfront_origin_header_name  # "X-Origin-Verify"
-      value = var.cloudfront_origin_secret        # "dawgs-armageddon-cf-secret-2025"
+      value = random_password.dawgs-armageddon_origin_header_value01.result
     }
   }
 
@@ -306,7 +307,7 @@ resource "aws_lb_listener_rule" "dawgs-armageddon_cf_origin_verify_rule" {
   condition {
     http_header {
       http_header_name = var.cloudfront_origin_header_name  # "X-Origin-Verify"
-      values           = [var.cloudfront_origin_secret]     # "dawgs-armageddon-cf-secret-2025"
+      values           = [random_password.dawgs-armageddon_origin_header_value01.result]
     }
   }
 }
@@ -356,6 +357,23 @@ resource "aws_route53_record" "dawgs-armageddon_cf_app_alias" {
     name                   = aws_cloudfront_distribution.dawgs-armageddon_cf01[0].domain_name
     zone_id                = aws_cloudfront_distribution.dawgs-armageddon_cf01[0].hosted_zone_id
     evaluate_target_health = false  # CloudFront does not support health-check evaluation on aliases
+  }
+
+  depends_on = [aws_cloudfront_distribution.dawgs-armageddon_cf01]
+}
+
+resource "aws_route53_record" "dawgs-armageddon_cf_apex_alias" {
+  count = var.enable_cloudfront ? 1 : 0
+
+  zone_id         = local.dawgs-armageddon_zone_id
+  name            = var.domain_name  # thedawgs2025.click
+  type            = "A"
+  allow_overwrite = true
+
+  alias {
+    name                   = aws_cloudfront_distribution.dawgs-armageddon_cf01[0].domain_name
+    zone_id                = aws_cloudfront_distribution.dawgs-armageddon_cf01[0].hosted_zone_id
+    evaluate_target_health = false
   }
 
   depends_on = [aws_cloudfront_distribution.dawgs-armageddon_cf01]
