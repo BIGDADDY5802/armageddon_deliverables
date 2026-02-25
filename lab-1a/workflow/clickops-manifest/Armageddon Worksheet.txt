@@ -1,7 +1,7 @@
 Armageddon Worksheet
 
 VPC: armageddon-demo
-Subnet Name: Public 1 - Private 1
+Subnet Name: Public 2 - Private 2
 
 Instance Name: lab-ec2-app
 
