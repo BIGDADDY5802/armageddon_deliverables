@@ -28,7 +28,7 @@ set -euo pipefail
 
 # ---------- Defaults (override via env) ----------
 REGION="${REGION:-us-east-1}"
-INSTANCE_ID="${INSTANCE_ID:-i-09d0743e867d1e543}"
+INSTANCE_ID="${INSTANCE_ID:-i-}"
 DB_ID="${DB_ID:-lab-rds01}"                   # RDS DBInstanceIdentifier
 DB_PORT="${DB_PORT:-3306}"               # optional override
 OUT_JSON="${OUT_JSON:-gate_result.json}"

@@ -28,7 +28,7 @@ set -euo pipefail
 
 # ---------- Defaults (override via env or flags) ----------
 REGION="${REGION:-us-east-1}"
-INSTANCE_ID="${INSTANCE_ID:-i-09d0743e867d1e543}"
+INSTANCE_ID="${INSTANCE_ID:-i-}"
 SECRET_ID="${SECRET_ID:-lab/rds/mysql}"
 OUT_JSON="${OUT_JSON:-gate_result.json}"
 
