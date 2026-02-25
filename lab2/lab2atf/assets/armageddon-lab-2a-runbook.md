@@ -416,3 +416,52 @@ Expected: WAF ARN present on the distribution.
 ---
 
 *Armageddon Lab 2A — Documentation complete. February 24, 2026.*
+network.db
+{
+  "gate": "network_db",
+  "timestamp_utc": "2026-02-25T03:08:09Z",
+  "region": "us-east-1",
+  "instance_id": "i-040b7acf67df2eab4",
+  "db_id": "lab-rds01",
+  "engine": "mysql",
+  "db_port": "3306",
+  "publicly_accessible": "False",
+  "ec2_security_groups": "sg-07a5930e511a01e68",
+  "rds_security_groups": "sg-08650d371e5723c33",
+  "db_subnet_group": "lab-rds-subnet-group01",
+  "toggles": {
+    "check_private_subnets": true
+  },
+  "status": "PASS",
+  "exit_code": 0,
+  "details": [
+"PASS: aws sts get-caller-identity succeeded (credentials OK).\nPASS: RDS instance exists (lab-rds01).\nPASS: RDS is not publicly accessible (PubliclyAccessible=False).\nINFO: using DB_PORT override = 3306.\nPASS: EC2 security groups resolved (i-040b7acf67df2eab4): sg-07a5930e511a01e68\nPASS: RDS security groups resolved (lab-rds01): sg-08650d371e5723c33\nPASS: RDS SG allows DB port 3306 from EC2 SG (SG-to-SG ingress present).\nINFO: DB subnet group (lab-rds-subnet-group01) subnets: subnet-02d4c15e137902c7b	subnet-0ecd2449775599c0e\nPASS: subnet subnet-02d4c15e137902c7b shows no IGW route (private check OK).\nPASS: subnet subnet-0ecd2449775599c0e shows no IGW route (private check OK)."],
+  "warnings": [],
+  "failures": []
+}
+
+secrets_and_role
+
+{
+  "gate": "secrets_and_role",
+  "timestamp_utc": "2026-02-25T03:19:15Z",
+  "region": "us-east-1",
+  "instance_id": "i-040b7acf67df2eab4",
+  "secret_id": "lab/rds/mysql",
+  "resolved_instance_profile_arn": "arn:aws:iam::778185677715:instance-profile/lab-instance-profile01",
+  "resolved_role_name": "lab-ec2-role01",
+  "caller_arn": "arn:aws:iam::778185677715:user/awscli",
+  "toggles": {
+    "require_rotation": false,
+    "check_secret_policy_wildcard": true,
+    "check_secret_value_read": false
+  },
+  "status": "PASS",
+  "exit_code": 0,
+  "details": [
+"PASS: aws sts get-caller-identity succeeded (credentials OK).\nPASS: secret exists and is describable (lab/rds/mysql).\nINFO: rotation requirement disabled (REQUIRE_ROTATION=false).\nPASS: no resource policy found (OK) or not applicable (lab/rds/mysql).\nPASS: instance has IAM instance profile attached (i-040b7acf67df2eab4).\nPASS: resolved instance profile -> role (lab-instance-profile01 -> lab-ec2-role01).\nINFO: EXPECTED_ROLE_NAME not set; using resolved role (lab-ec2-role01).\nINFO: on-instance checks skipped (not running as expected role on EC2)."],
+  "warnings": [
+"WARN: current caller ARN is not assumed-role/lab-ec2-role01 (you may be running off-instance)."],
+  "failures": []
+}
+
