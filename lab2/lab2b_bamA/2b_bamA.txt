@@ -1,0 +1,639 @@
+#2026.2.26lab2b_be_a_man_a
+
+
+Goal
+Implement safe caching for dynamic web/API where:
+    If origin responds with Cache-Control: public, s-maxage=30 → CloudFront caches 30 seconds
+    If origin responds with Cache-Control: private, no-store (or no cache-control) → CloudFront does not cache
+    Cache key includes only what truly varies the response
+    Students prove correctness using:
+      x-cache (Hit from cloudfront, Miss from cloudfront) 
+      Age header behavior
+      and app-visible evidence
+
+
+
+Apply complete! Resources: 117 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+alb_direct_url_for_403_test = "https://lab-alb01-1589705221.us-east-1.elb.amazonaws.com"
+app_url_http = "http://app.thedawgs2025.click"
+app_url_https = "https://app.thedawgs2025.click"
+app_urls = {
+  "alb_direct" = "http://lab-alb01-1589705221.us-east-1.elb.amazonaws.com"
+  "http" = "http://app.thedawgs2025.click"
+  "https" = "https://app.thedawgs2025.click"
+}
+base_domain = "thedawgs2025.click"
+cloudfront_acm_cert_arn = "arn:aws:acm:us-east-1:778185677715:certificate/9ae373b3-8f4f-4985-b6fd-1003d67638f5"
+cloudfront_app_url = "https://app.thedawgs2025.click"
+cloudfront_distribution_arn = "arn:aws:cloudfront::778185677715:distribution/EIB7U099UQZLH"
+cloudfront_distribution_domain = "d2cvsy3eddq0eq.cloudfront.net"
+cloudfront_distribution_id = "EIB7U099UQZLH"
+cloudfront_distribution_status = "InProgress"
+cloudfront_origin_header_name = "X-Origin-Verify"
+cloudfront_origin_secret_hint = "(set — see var.cloudfront_origin_secret)"
+cloudfront_raw_domain_url = "https://d2cvsy3eddq0eq.cloudfront.net"
+cloudfront_waf_acl_arn = "arn:aws:wafv2:us-east-1:778185677715:global/webacl/lab-cf-waf01/23771c38-18e4-4260-9475-42e23b01ebb8"
+cloudfront_waf_log_group = "aws-waf-logs-lab-cf-webacl01"
+dawgs-armageddon_acm_cert_arn = "arn:aws:acm:us-east-1:778185677715:certificate/91ecf817-fc8f-46e8-8f6c-895611284f7d"
+dawgs-armageddon_alb_dns_name = "lab-alb01-1589705221.us-east-1.elb.amazonaws.com"
+dawgs-armageddon_apex_url_https = "https://thedawgs2025.click"
+dawgs-armageddon_dashboard_name = "lab-dashboard01"
+dawgs-armageddon_ec2_instance_id = "i-01cadde582092b835"
+dawgs-armageddon_ec2_private_instance_id = "i-09fdfc59b26d46664"
+dawgs-armageddon_log_group_name = "/aws/ec2/lab-rds-app"
+dawgs-armageddon_private_subnet_ids = [
+  "subnet-0757c42ec16542fbd",
+  "subnet-0488a23b0bf311a85",
+]
+dawgs-armageddon_public_subnet_ids = [
+  "subnet-0e12e1ce69c6307e3",
+  "subnet-0b4dae9db5377853d",
+]
+dawgs-armageddon_rds_endpoint = "lab-rds01.c89ykq22i31z.us-east-1.rds.amazonaws.com"
+dawgs-armageddon_sns_topic_arn = "arn:aws:sns:us-east-1:778185677715:lab-db-incidents"
+dawgs-armageddon_target_group_arn = "arn:aws:elasticloadbalancing:us-east-1:778185677715:targetgroup/lab-tg01/2550e202a71040f4"
+dawgs-armageddon_vpc_id = "vpc-0e9bcc1bed68794f8"
+dawgs-armageddon_waf_arn = "arn:aws:wafv2:us-east-1:778185677715:regional/webacl/lab-waf01/1cd6dfcb-26ad-48d5-afac-aeb25bfbb236"
+dawgs-armageddon_waf_log_destination = "cloudwatch"
+lb_url = "http://lab-alb01-1589705221.us-east-1.elb.amazonaws.com"
+
+curl -si http://lab-alb01-1589705221.us-east-1.elb.amazonaws.com/api/public-feed | grep cache-control
+# Must show: cache-control: public, s-maxage=30, max-age=0
+
+# Get the instance IP
+ aws ec2 describe-instances \
+  --instance-ids i-01cadde582092b835 \
+  --query "Reservations[0].Instances[0].PrivateIpAddress" \
+  --output text
+10.190.1.13
+
+aws ssm start-session --target i-01cadde582092b835
+
+
+sudo systemctl status rdsapp
+ΓùÅ rdsapp.service - Lab 1b RDS App
+     Loaded: loaded (/etc/systemd/system/rdsapp.service; enabled; preset: disab>
+     Active: active (running) since Fri 2026-02-27 03:41:28 UTC; 15min ago
+    Process: 18567 ExecStartPre=/usr/bin/sleep 20 (code=exited, status=0/SUCCES>
+   Main PID: 25190 (python3)
+      Tasks: 1 (limit: 1067)
+     Memory: 56.2M
+        CPU: 718ms
+     CGroup: /system.slice/rdsapp.service
+             ΓööΓöÇ25190 /usr/bin/python3 /opt/rdsapp/app.py
+
+Feb 27 03:41:28 ip-10-190-1-13.ec2.internal systemd[1]: Started rdsapp.service >
+Feb 27 03:41:29 ip-10-190-1-13.ec2.internal python3[25190]: /usr/local/lib/pyth>
+Feb 27 03:41:29 ip-10-190-1-13.ec2.internal python3[25190]:   warnings.warn(war>
+Feb 27 03:41:29 ip-10-190-1-13.ec2.internal python3[25190]:  * Serving Flask ap>
+Feb 27 03:41:29 ip-10-190-1-13.ec2.internal python3[25190]:  * Debug mode: off
+Feb 27 03:41:29 ip-10-190-1-13.ec2.internal python3[25190]: WARNING: This is a >
+Feb 27 03:41:29 ip-10-190-1-13.ec2.internal python3[25190]:  * Running on all a>
+Feb 27 03:41:29 ip-10-190-1-13.ec2.internal python3[25190]:  * Running on http:>
+Feb 27 03:41:29 ip-10-190-1-13.ec2.internal python3[25190]:  * Running on http:>
+Feb 27 03:41:29 ip-10-190-1-13.ec2.internal python3[25190]: Press CTRL+C to quit
+
+curl -si http://localhost:80/
+HTTP/1.1 200 OK
+Server: Werkzeug/3.1.6 Python/3.9.25
+Date: Fri, 27 Feb 2026 03:58:22 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 237
+Connection: close
+
+
+    <h1>Lab 1b: Simple RDS App</h1>
+    <ul>
+        <li><a href='/init'>1. Init DB</a></li>
+        <li><a href='/add?text=LabEntry'>2. Add Note (?text=...)</a></li>
+        <li><a href='/api/list'>3. List Notes</a></li>
+    </ul>
+
+
+curl -si http://localhost:80/
+HTTP/1.1 200 OK
+Server: Werkzeug/3.1.6 Python/3.9.25
+Date: Fri, 27 Feb 2026 03:58:22 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 237
+Connection: close
+
+
+    <h1>Lab 1b: Simple RDS App</h1>
+    <ul>
+        <li><a href='/init'>1. Init DB</a></li>
+        <li><a href='/add?text=LabEntry'>2. Add Note (?text=...)</a></li>
+        <li><a href='/api/list'>3. List Notes</a></li>
+    </ul>
+    sh-5.2$ curl -si http://localhost:80/api/public-feed
+HTTP/1.1 200 OK
+Server: Werkzeug/3.1.6 Python/3.9.25
+Date: Fri, 27 Feb 2026 03:59:00 GMT
+Content-Type: application/json
+Content-Length: 120
+Cache-Control: public, s-maxage=30, max-age=0
+Connection: close
+
+{"message":"Message of the minute \u2014 cached by CloudFront for 30 seconds","server_time_utc":"2026-02-27T03:59:00Z"}
+
+ grep "app.route" /opt/rdsapp/app.py
+@app.route("/")
+@app.route("/add")
+@app.route("/api/list")
+@app.route("/api/public-feed")
+@app.route("/init")
+
+
+#####
+
+  curl -si https://thedawgs2025.click/api/public-feed | grep -E "cache-control|x-cache|age"
+Cache-Control: public, s-maxage=30, max-age=0
+{"message":"Message of the minute \u2014 cached by CloudFront for 30 seconds","server_time_utc":"2026-02-27T04:02:56Z"}
+
+
+
+ curl -si https://thedawgs2025.click/api/public-feed | grep -E "cache-control|x-cache|age"
+Cache-Control: public, s-maxage=30, max-age=0
+{"message":"Message of the minute \u2014 cached by CloudFront for 30 seconds","server_time_utc":"2026-02-27T04:02:56Z"}
+
+
+curl -si https://thedawgs2025.click/api/public-feed | grep -E "cache-control|x-cache|age"
+Cache-Control: public, s-maxage=30, max-age=0
+{"message":"Message of the minute \u2014 cached by CloudFront for 30 seconds","server_time_utc":"2026-02-27T04:03:57Z"}
+
+
+ curl -si https://thedawgs2025.click/api/list | grep -E "cache-control|x-cache"
+
+
+ curl -si https://thedawgs2025.click/api/list | grep -E "cache-control|x-cache"
+
+
+
+######
+
+ curl -si https://thedawgs2025.click/api/public-feed | grep -i "x-cache\|age\|cache-control"
+Cache-Control: public, s-maxage=30, max-age=0
+X-Cache: Miss from cloudfront
+{"message":"Message of the minute \u2014 cached by CloudFront for 30 seconds","server_time_utc":"2026-02-27T04:05:53Z"}
+
+
+ curl -si https://thedawgs2025.click/api/list
+HTTP/1.1 500 INTERNAL SERVER ERROR
+Content-Type: text/html; charset=utf-8
+Content-Length: 56
+Connection: keep-alive
+Date: Fri, 27 Feb 2026 04:06:52 GMT
+Server: Werkzeug/3.1.6 Python/3.9.25
+X-Cache: Error from cloudfront
+Via: 1.1 9485615792f5f5ecef76608e38635192.cloudfront.net (CloudFront)
+X-Amz-Cf-Pop: DFW59-P7
+Alt-Svc: h3=":443"; ma=86400
+X-Amz-Cf-Id: fC6G0ueETWsQHtbtmYZCM-u3In1U0bwgPxF7YaEFxVOJnyPfGv0Bbg==
+
+
+ curl -si https://thedawgs2025.click/init
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+Content-Length: 34
+Connection: keep-alive
+Date: Fri, 27 Feb 2026 04:07:41 GMT
+Server: Werkzeug/3.1.6 Python/3.9.25
+X-Cache: Miss from cloudfront
+Via: 1.1 c035a3f92bcaf76b0bf4256d4c912ad4.cloudfront.net (CloudFront)
+X-Amz-Cf-Pop: DFW59-P7
+Alt-Svc: h3=":443"; ma=86400
+X-Amz-Cf-Id: 728h8p6GqLAxtz-q3bLPViP8mnBPSSCkb1CHxpiydwasB4r6SFqSSg==
+
+Init Success! <a href='/'>Back</a>
+
+
+ curl -si https://thedawgs2025.click/api/list | grep -i "x-cache\|cache-control\|age"
+X-Cache: Miss from cloudfront
+
+
+#####
+
+curl -si https://thedawgs2025.click/api/list | grep -i "x-cache\|cache-control\|age"
+X-Cache: Miss from cloudfront
+
+
+aws ssm start-session --target i-01cadde582092b835
+
+Starting session with SessionId: awscli-ofn6qrrbxt2gxaxga5hosghdhe
+
+
+ curl -si http://localhost:80/api/list | grep -i cache-control
+
+
+curl -si https://thedawgs2025.click/api/list | grep -i "x-cache\|cache-control\|age"
+x-cache: Miss from cloudfront
+
+ 
+grep -A 20 'route("/api/list")' /opt/rdsapp/app.py
+@app.route("/api/list")
+def list_notes():
+    try:
+        conn = get_conn()
+        cur = conn.cursor()
+        cur.execute("SELECT id, note FROM notes ORDER BY id DESC;")
+        rows = cur.fetchall()
+        cur.close()
+        conn.close()
+        return "<h3>Notes:</h3>" + "".join([f"<li>{r[1]}</li>" for r in rows]) + "<br><a href='/'>Back</a>"
+    except Exception as e:
+        record_failure(str(e))
+        return f"List Failed: {e}", 500
+
+
+@app.route("/api/public-feed")
+def public_feed():
+    # Honors 2B: public cacheable endpoint.
+    # s-maxage=30 targets shared caches (CloudFront). CDNs read s-maxage first,
+    # ignoring max-age=0. Browsers read max-age=0 and revalidate every time ΓÇö
+    # so the browser always asks CloudFront, but CloudFront serves from cache
+
+
+#####
+
+
+ sudo python3 << 'EOF'
+c> content = open('/opt/rdsapp/app.py').read()
+> old = '        return "<h3>Notes:</h3>" + "".join([f"<li>{r[1]}</li>" for r in
+ rows]) + "<br><a href=\'/\'>Back</a>"'
+> new = '''        from flask import make_response
+>         resp = make_response("<h3>Notes:</h3>" + "".join([f"<li>{r[1]}</li>" for r in rows]) + "<br><a href=\'/\'>Back</a>")
+>         resp.headers["Cache-Control"] = "private, no-store"
+  >         return resp'''
+> if old in content:
+ >     open('/opt/rdsapp/app.py', 'w').write(content.replace(old, new))
+>     print("Fixed")
+> else:
+>     print("NOT FOUND")
+> EOF
+Fixed
+
+
+sudo systemctl restart rdsapp
+
+
+curl -si http://localhost:80/api/list | grep -i cache-control
+Cache-Control: private, no-store
+
+#####
+
+ curl -si https://thedawgs2025.click/api/list | grep -i "x-cache\|cache-control\|age"
+X-Cache: Miss from cloudfront
+
+ curl -si https://thedawgs2025.click/api/list | grep -i "x-cache\|cache-control\|age"
+X-Cache: Miss from cloudfront
+
+
+
+curl -si https://thedawgs2025.click/api/public-feed | grep -i "x-cache\|cache-control\|age"
+Cache-Control: public, s-maxage=30, max-age=0
+X-Cache: Miss from cloudfront
+{"message":"Message of the minute \u2014 cached by CloudFront for 30 seconds","server_time_utc":"2026-02-27T04:19:58Z"}
+
+
+curl -si https://thedawgs2025.click/api/public-feed | grep -i "x-cache\|cache-control\|age"
+Cache-Control: public, s-maxage=30, max-age=0
+X-Cache: Hit from cloudfront
+Age: 5
+{"message":"Message of the minute \u2014 cached by CloudFront for 30 seconds","server_time_utc":"2026-02-27T04:19:58Z"}
+
+
+curl -si https://thedawgs2025.click/api/public-feed | grep -i "x-cache\|cache-control\|age"
+Cache-Control: public, s-maxage=30, max-age=0
+X-Cache: Miss from cloudfront
+{"message":"Message of the minute \u2014 cached by CloudFront for 30 seconds","server_time_utc":"2026-02-27T04:20:47Z"}
+
+#####
+
+ curl -i https://thedawgs2025.click/api/public-feed | sed -n '1,20p'
+  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+                                 Dload  Upload  Total   Spent   Left   Speed
+100    120 100    120   0      0    525      0                              0
+HTTP/1.1 200 OK
+Content-Type: application/json
+Content-Length: 120
+Connection: keep-alive
+Date: Fri, 27 Feb 2026 04:27:13 GMT
+Cache-Control: public, s-maxage=30, max-age=0
+Server: Werkzeug/3.1.6 Python/3.9.25
+X-Cache: Miss from cloudfront
+Via: 1.1 c035a3f92bcaf76b0bf4256d4c912ad4.cloudfront.net (CloudFront)
+X-Amz-Cf-Pop: DFW59-P7
+Alt-Svc: h3=":443"; ma=86400
+X-Amz-Cf-Id: fxHPGw8F8XnkV6_fQcPGgif5z-R43KG2bzMFeaMecOZQ_5XbNJcecw==
+
+{"message":"Message of the minute \u2014 cached by CloudFront for 30 seconds","server_time_utc":"2026-02-27T04:27:13Z"}
+
+
+ curl -i https://thedawgs2025.click/api/list | sed -n '1,30p'
+  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+                                 Dload  Upload  Total   Spent   Left   Speed
+100     39 100     39   0      0     82      0                              0
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+Content-Length: 39
+Connection: keep-alive
+Date: Fri, 27 Feb 2026 04:32:10 GMT
+Server: Werkzeug/3.1.6 Python/3.9.25
+X-Cache: Miss from cloudfront
+Via: 1.1 9f377ebb53727c47a0d0a6977cbc5b1a.cloudfront.net (CloudFront)
+X-Amz-Cf-Pop: DFW59-P7
+Alt-Svc: h3=":443"; ma=86400
+X-Amz-Cf-Id: cb7SRthZEcFCACbFKX8Y5EqId6IkQHxFnSMiT4_1lziFa_3NrFn-zg==
+
+
+--------
+
+
+ DIST_ID=$(aws cloudfront list-distributions \
+  --query "DistributionList.Items[].[Id,Aliases.Items]" \
+  --output text | grep -B1 "thedawgs2025.click" | head -1)
+
+
+ echo $DIST_ID
+EIB7U099UQZLH
+
+aws cloudfront create-invalidation \
+  --distribution-id $DIST_ID \
+  --paths "/api/list"
+
+An error occurred (InvalidArgument) when calling the CreateInvalidation operation: Your request contains one or more invalid invalidation paths.
+
+
+aws cloudfront create-invalidation \
+  --distribution-id $DIST_ID \
+  --paths "/api/*"
+{
+    "Location": "https://cloudfront.amazonaws.com/2020-05-31/distribution/EIB7U099UQZLH/invalidation/IELMFJXNLZCT3QL1ITGSIOMJ4I",
+    "Invalidation": {
+        "Id": "IELMFJXNLZCT3QL1ITGSIOMJ4I",
+        "Status": "InProgress",
+        "CreateTime": "2026-02-27T04:40:38.413000+00:00",
+        "InvalidationBatch": {
+            "Paths": {
+                "Quantity": 1,
+                "Items": [
+                    "/api/*"
+                ]
+            },
+            "CallerReference": "cli-1772167239-277066"
+        }
+    }
+}
+
+
+------
+
+ curl -i https://thedawgs2025.click/api/list | sed -n '1,30p'
+  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+                                 Dload  Upload  Total   Spent   Left   Speed
+100     39 100     39   0      0     91      0                              0
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+Content-Length: 39
+Connection: keep-alive
+Date: Fri, 27 Feb 2026 04:43:08 GMT
+Server: Werkzeug/3.1.6 Python/3.9.25
+X-Cache: Miss from cloudfront
+Via: 1.1 12d0a54ae689685875d921c4d6ae92b4.cloudfront.net (CloudFront)
+X-Amz-Cf-Pop: DFW59-P7
+Alt-Svc: h3=":443"; ma=86400
+X-Amz-Cf-Id: pW18D4-f3iAHEcJi95LCe7vP4k9HkLyjQ-hMzJXJWdw63vbsdggoJw==
+
+<h3>Notes:</h3><br><a href='/'>Back</a>
+
+
+curl -si http://lab-alb01-1589705221.us-east-1.elb.amazonaws.com/api/list | grep -i cache-control
+
+ aws elbv2 describe-target-health \
+  --target-group-arn $(aws elbv2 describe-target-groups \
+    --names lab-tg01 \
+    --query "TargetGroups[0].TargetGroupArn" \
+    --output text) \
+  --query "TargetHealthDescriptions[*].{ID:Target.Id,State:TargetHealth.State}" \
+  --output table
+------------------------------------
+|       DescribeTargetHealth       |
++----------------------+-----------+
+|          ID          |   State   |
++----------------------+-----------+
+|  i-09fdfc59b26d46664 |  healthy  |
++----------------------+-----------+
+
+aws ssm start-session --target i-01cadde582092b835
+
+Starting session with SessionId: awscli-nhod2j5ls6aqi4yzff7qsoauyy
+
+
+------
+
+
+ grep -A 5 'route("/api/list")' /opt/rdsapp/app.py | grep -i "make_response\|Cache"
+
+
+ aws ssm start-session --target i-09fdfc59b26d46664
+
+Starting session with SessionId: awscli-8hibjeapeu5oc7i6n2ys9k9p3a
+
+ sudo python3 << 'EOF'
+c> content = open('/opt/rdsapp/app.py').read()
+> old = '        return "<h3>Notes:</h3>" + "".join([f"<li>{r[1]}</li>" for r in rows]) + "<br><a href=\'/\'>Back</a>"'
+> new = '''        from flask import make_response
+>         resp = make_response("<h3>Notes:</h3>" + "".join([f"<li>{r[1]}</li>" for r in rows]) + "<br><a href=\'/\'>Back</a>")
+>         resp.headers["Cache-Control"] = "private, no-store"
+>         return resp'''
+> if old in content:
+ >     open('/opt/rdsapp/app.py', 'w').write(content.replace(old, new))
+ >     print("Fixed")
+> else:
+>     print("NOT FOUND")
+> EOF
+Fixed
+
+ sudo systemctl restart rdsapp
+
+ curl -si http://localhost:80/api/list | grep -i cache-control
+Cache-Control: private, no-store
+
+curl -i https://thedawgs2025.click/api/list | sed -n '1,30p'
+  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+                                 Dload  Upload  Total   Spent   Left   Speed
+100     39 100     39   0      0     82      0                              0
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+Content-Length: 39
+Connection: keep-alive
+Date: Fri, 27 Feb 2026 04:56:38 GMT
+Cache-Control: private, no-store
+Server: Werkzeug/3.1.6 Python/3.9.25
+X-Cache: Miss from cloudfront
+Via: 1.1 54d81c7f05961e7402393035f5c92196.cloudfront.net (CloudFront)
+X-Amz-Cf-Pop: DFW59-P7
+Alt-Svc: h3=":443"; ma=86400
+X-Amz-Cf-Id: IgCimTKNmKlHi5Q1E7NiME8CwaRmikN34gGq3ON7obZrhxGXFE3gbQ==
+
+<h3>Notes:</h3><br><a href='/'>Back</a>
+
+#####
+
+curl -si https://thedawgs2025.click/api/list | grep -i "x-cache\|cache-control"
+Cache-Control: private, no-store
+X-Cache: Miss from cloudfront
+
+
+curl -si https://thedawgs2025.click/api/list | grep -i "x-cache\|cache-control"
+Cache-Control: private, no-store
+X-Cache: Miss from cloudfront
+
+ curl -si https://thedawgs2025.click/api/public-feed | grep -i "x-cache\|cache-control\|age"
+Cache-Control: public, s-maxage=30, max-age=0
+X-Cache: Miss from cloudfront
+{"message":"Message of the minute \u2014 cached by CloudFront for 30 seconds","server_time_utc":"2026-02-27T05:00:11Z"}
+
+curl -si https://thedawgs2025.click/api/public-feed | grep -i "x-cache\|cache-control\|age"
+Cache-Control: public, s-maxage=30, max-age=0
+X-Cache: Hit from cloudfront
+Age: 8
+{"message":"Message of the minute \u2014 cached by CloudFront for 30 seconds","server_time_utc":"2026-02-27T05:00:11Z"}
+
+ curl -si https://thedawgs2025.click/api/public-feed | grep -i "x-cache\|cache-control\|age"
+Cache-Control: public, s-maxage=30, max-age=0
+X-Cache: Miss from cloudfront
+{"message":"Message of the minute \u2014 cached by CloudFront for 30 seconds","server_time_utc":"2026-02-27T05:00:54Z"}
+
+
+-----
+
+
+curl -i https://thedawgs2025.click/api/list | sed -n '1,30p'
+  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+                                 Dload  Upload  Total   Spent   Left   Speed
+100     39 100     39   0      0     86      0                              0
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+Content-Length: 39
+Connection: keep-alive
+Date: Fri, 27 Feb 2026 05:03:36 GMT
+Cache-Control: private, no-store
+Server: Werkzeug/3.1.6 Python/3.9.25
+X-Cache: Miss from cloudfront
+Via: 1.1 bf949b382adba1e21f3a5de9345496a4.cloudfront.net (CloudFront)
+X-Amz-Cf-Pop: DFW59-P7
+Alt-Svc: h3=":443"; ma=86400
+X-Amz-Cf-Id: Q7TnA_hwLBCeZIVukt8pUAbW8DevYbnh-7QYpgS4Mg-GQaKaXZgc9A==
+
+<h3>Notes:</h3><br><a href='/'>Back</a>
+
+
+curl -i https://thedawgs2025.click/api/list | sed -n '1,30p'
+  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
+                                 Dload  Upload  Total   Spent   Left   Speed
+100     39 100     39   0      0     86      0                              0
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+Content-Length: 39
+Connection: keep-alive
+Date: Fri, 27 Feb 2026 05:03:36 GMT
+Cache-Control: private, no-store
+Server: Werkzeug/3.1.6 Python/3.9.25
+X-Cache: Miss from cloudfront
+Via: 1.1 bf949b382adba1e21f3a5de9345496a4.cloudfront.net (CloudFront)
+X-Amz-Cf-Pop: DFW59-P7
+Alt-Svc: h3=":443"; ma=86400
+X-Amz-Cf-Id: Q7TnA_hwLBCeZIVukt8pUAbW8DevYbnh-7QYpgS4Mg-GQaKaXZgc9A==
+
+<h3>Notes:</h3><br><a href='/'>Back</a>
+
+
+aws ssm start-session --target i-09fdfc59b26d46664
+
+Starting session with SessionId: awscli-hjpd73dq4txdsr46krgbed9zna
+
+ sudo python3 << 'EOF'
+> content = open('/opt/rdsapp/app.py').read()
+> old = '    response.headers["Cache-Control"] = "public, s-maxage=30, max-age=0"'
+ne> new = '    # response.headers["Cache-Control"] = "public, s-maxage=30, max-a=0"'
+> if old in content:
+>     open('/opt/rdsapp/app.py', 'w').write(content.replace(old, new))
+>     print("Header removed")
+> else:
+>     print("NOT FOUND")
+> EOF
+sudo systemctl restart rdsappHeader removed
+
+
+sudo systemctl restart rdsapp
+
+#####
+
+curl -si https://thedawgs2025.click/api/public-feed | grep -i "x-cache\|cache-control\|age"
+X-Cache: Miss from cloudfront
+{"message":"Message of the minute \u2014 cached by CloudFront for 30 seconds","server_time_utc":"2026-02-27T05:06:34Z"}
+
+
+curl -si https://thedawgs2025.click/api/public-feed | grep -i "x-cache\|cache-control\|age"
+X-Cache: Miss from cloudfront
+{"message":"Message of the minute \u2014 cached by CloudFront for 30 seconds","server_time_utc":"2026-02-27T05:06:51Z"}
+
+
+curl -si https://thedawgs2025.click/api/public-feed | grep -i "x-cache\|cache-control\|age"
+X-Cache: Miss from cloudfront
+{"message":"Message of the minute \u2014 cached by CloudFront for 30 seconds","server_time_utc":"2026-02-27T05:10:17Z"}
+
+ curl -si https://thedawgs2025.click/api/public-feed | grep -i "x-cache\|cache-control\|age"
+X-Cache: Miss from cloudfront
+{"message":"Message of the minute \u2014 cached by CloudFront for 30 seconds","server_time_utc":"2026-02-27T05:10:22Z"}
+
+
+
+-----
+
+aws ssm start-session --target i-09fdfc59b26d46664                            
+Starting session with SessionId: awscli-n4c4rvsr25rdvp29gjtxfdskcy
+
+
+
+grep -n "Cache-Control\|s-maxage" /opt/rdsapp/app.py
+104:        resp.headers["Cache-Control"] = "private, no-store"
+114:    # s-maxage=30 targets shared caches (CloudFront). CDNs read s-maxage first,
+126:    # response.headers["Cache-Control"] = "public, s-maxage=30, max-age=0"
+
+
+
+sudo sed -i '126s/.*/    response.headers["Cache-Control"] = "public, s-
+maxage=30, max-age=0"/' /opt/rdsapp/app.py
+
+
+
+grep -n "Cache-Control\|s-maxage" /opt/rdsapp/app.py
+104:        resp.headers["Cache-Control"] = "private, no-store"
+114:    # s-maxage=30 targets shared caches (CloudFront). CDNs read s-maxage first,
+126:    response.headers["Cache-Control"] = "public, s-maxage=30, max-age=0"
+
+
+
+sudo systemctl restart rdsapp
+
+
+curl -si http://localhost:80/api/public-feed | grep -i cache-control
+Cache-Control: public, s-maxage=30, max-age=0
+
+curl -si https://thedawgs2025.click/api/public-feed | grep -i "x-cache\|cache-control\|age"
+Cache-Control: public, s-maxage=30, max-age=0
+X-Cache: Miss from cloudfront
+{"message":"Message of the minute \u2014 cached by CloudFront for 30 seconds","server_time_utc":"2026-02-27T05:17:12Z"}
+
+
+
+curl -si https://thedawgs2025.click/api/public-feed | grep -i "x-cache\|cache-control\|age"
+Cache-Control: public, s-maxage=30, max-age=0
+X-Cache: Hit from cloudfront
+Age: 15
+{"message":"Message of the minute \u2014 cached by CloudFront for 30 seconds","server_time_utc":"2026-02-27T05:17:12Z"}
