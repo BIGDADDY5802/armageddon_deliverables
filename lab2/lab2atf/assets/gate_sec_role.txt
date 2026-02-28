@@ -1,0 +1,26 @@
+./gate_secrets_and_role.sh
+
+=== SEIR Gate: Secrets + EC2 Role Verification ===
+Timestamp (UTC): 2026-02-28T03:28:26Z
+Region:          us-east-1
+Instance ID:     i-0f2de2e680e09601e
+Secret ID:       lab/rds/mysql
+Resolved Role:   lab-ec2-role01
+Caller ARN:      arn:aws:iam::778185677715:user/awscli
+-----------------------------------------------
+PASS: aws sts get-caller-identity succeeded (credentials OK).
+PASS: secret exists and is describable (lab/rds/mysql).
+INFO: rotation requirement disabled (REQUIRE_ROTATION=false).
+PASS: no resource policy found (OK) or not applicable (lab/rds/mysql).
+PASS: instance has IAM instance profile attached (i-0f2de2e680e09601e).
+PASS: resolved instance profile -> role (lab-instance-profile01 -> lab-ec2-role01).
+INFO: EXPECTED_ROLE_NAME not set; using resolved role (lab-ec2-role01).
+INFO: on-instance checks skipped (not running as expected role on EC2).
+
+Warnings:
+  - WARN: current caller ARN is not assumed-role/lab-ec2-role01 (you may be running off-instance).
+
+RESULT: PASS
+===============================================
+
+Wrote: gate_result.json

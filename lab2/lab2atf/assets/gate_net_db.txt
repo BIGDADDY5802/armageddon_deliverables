@@ -1,0 +1,26 @@
+./gate_network_db.sh
+
+=== SEIR Gate: Network + RDS Verification ===
+Timestamp (UTC): 2026-02-28T03:35:10Z
+Region:          us-east-1
+EC2 Instance:    i-0f2de2e680e09601e
+RDS Instance:    lab-rds01
+Engine:          mysql
+DB Port:         3306
+Caller ARN:      arn:aws:iam::778185677715:user/awscli
+-------------------------------------------
+PASS: aws sts get-caller-identity succeeded (credentials OK).
+PASS: RDS instance exists (lab-rds01).
+PASS: RDS is not publicly accessible (PubliclyAccessible=False).
+INFO: using DB_PORT override = 3306.
+PASS: EC2 security groups resolved (i-0f2de2e680e09601e): sg-0b71654eb8a84d739
+PASS: RDS security groups resolved (lab-rds01): sg-0de73ba613bbb2649
+PASS: RDS SG allows DB port 3306 from EC2 SG (SG-to-SG ingress present).
+INFO: DB subnet group (lab-rds-subnet-group01) subnets: subnet-093611c0c99281944subnet-086fedc6cfb5e1e88
+PASS: subnet subnet-093611c0c99281944 shows no IGW route (private check OK).
+PASS: subnet subnet-086fedc6cfb5e1e88 shows no IGW route (private check OK).
+
+RESULT: PASS
+===========================================
+
+Wrote: gate_result.json
