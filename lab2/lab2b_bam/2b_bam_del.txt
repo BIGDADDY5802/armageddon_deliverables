@@ -1,0 +1,608 @@
+alb_direct_url_for_403_test = "https://lab-alb01-915057804.us-east-1.elb.amazonaws.com"
+app_url_http = "http://app.thedawgs2025.click"
+app_url_https = "https://app.thedawgs2025.click"
+app_urls = {
+  "alb_direct" = "http://lab-alb01-915057804.us-east-1.elb.amazonaws.com"
+  "http" = "http://app.thedawgs2025.click"
+  "https" = "https://app.thedawgs2025.click"
+}
+base_domain = "thedawgs2025.click"
+cloudfront_acm_cert_arn = "arn:aws:acm:us-east-1:778185677715:certificate/2f0cbfa1-c185-4e79-bfb5-beeebb2e1cf4"
+cloudfront_app_url = "https://app.thedawgs2025.click"
+cloudfront_distribution_arn = "arn:aws:cloudfront::778185677715:distribution/E23IU5LEZN6JWC"
+cloudfront_distribution_domain = "d2bxtlbua9poar.cloudfront.net"
+cloudfront_distribution_id = "E23IU5LEZN6JWC"
+cloudfront_distribution_status = "InProgress"
+cloudfront_origin_header_name = "X-Origin-Verify"
+cloudfront_origin_secret_hint = "(set — see var.cloudfront_origin_secret)"
+cloudfront_raw_domain_url = "https://d2bxtlbua9poar.cloudfront.net"
+cloudfront_waf_acl_arn = "arn:aws:wafv2:us-east-1:778185677715:global/webacl/lab-cf-waf01/6f7ea389-33c8-4f7c-a1b1-b86ef88b1ab6"
+cloudfront_waf_log_group = "aws-waf-logs-lab-cf-webacl01"
+dawgs-armageddon_acm_cert_arn = "arn:aws:acm:us-east-1:778185677715:certificate/8f176aae-e41a-435e-a511-9f3caf5fc6fa"
+dawgs-armageddon_alb_dns_name = "lab-alb01-915057804.us-east-1.elb.amazonaws.com"
+dawgs-armageddon_apex_url_https = "https://thedawgs2025.click"
+dawgs-armageddon_dashboard_name = "lab-dashboard01"
+dawgs-armageddon_ec2_instance_id = "i-06d2a61690a16a522"
+dawgs-armageddon_ec2_private_instance_id = "i-04fa68565bcb544f4"
+dawgs-armageddon_log_group_name = "/aws/ec2/lab-rds-app"
+dawgs-armageddon_private_subnet_ids = [
+  "subnet-00eefff8cad691a1a",
+  "subnet-0465f59c9d46951dc",
+]
+dawgs-armageddon_public_subnet_ids = [
+  "subnet-0c0a719df7a74f003",
+  "subnet-0cb4d7c2c1a3c3e26",
+]
+dawgs-armageddon_rds_endpoint = "lab-rds01.c89ykq22i31z.us-east-1.rds.amazonaws.com"
+dawgs-armageddon_sns_topic_arn = "arn:aws:sns:us-east-1:778185677715:lab-db-incidents"
+dawgs-armageddon_target_group_arn = "arn:aws:elasticloadbalancing:us-east-1:778185677715:targetgroup/lab-tg01/7ef4b6cc311d87b8"
+dawgs-armageddon_vpc_id = "vpc-0b374ea74915d8c0a"
+dawgs-armageddon_waf_arn = "arn:aws:wafv2:us-east-1:778185677715:regional/webacl/lab-waf01/7ae64c85-37ad-4505-aae7-eda4a733275a"
+dawgs-armageddon_waf_log_destination = "cloudwatch"
+lb_url = "http://lab-alb01-915057804.us-east-1.elb.amazonaws.com"
+
+vpc-0b374ea74915d8c0a
+
+
+  aws ec2 describe-vpcs \
+  --query 'Vpcs[*].[Tags[?Key==`Name`].Value|[0],VpcId]' \
+  --output table
+-----------------------------------------
+|             DescribeVpcs              |
++-------------+-------------------------+
+|  DONOTTOUCH |  vpc-035440d5ab0a4ab71  |
+|  lab-vpc01  |  vpc-0b374ea74915d8c0a  |
++-------------+-------------------------+
+
+
+
+
+
+
+aws ec2 describe-security-groups \
+  --filters "Name=vpc-id,Values=vpc-0b374ea74915d8c0a" "Name=group-name,Values=lab*" \
+  --query 'SecurityGroups[*].[GroupName,GroupId]' \
+  --output table
+-------------------------------------------
+|         DescribeSecurityGroups          |
++----------------+------------------------+
+|  lab-ec2-sg01  |  sg-06ab1e32bd5435dcb  |
+|  lab-rds-sg01  |  sg-0970b8f5fa9ef3358  |
+|  lab-alb-sg01  |  sg-0a4a1f67bd5ca8eee  |
+|  lab-alb-sg02  |  sg-0b7797fcc4e237d74  |
+|  lab-vpce-sg01 |  sg-0d8bd819499695816  |
++----------------+------------------------+
+
+
+chmod +x run_all_gates_alb.sh
+
+ORIGIN_REGION=us-east-1 \
+CF_DISTRIBUTION_ID=E23IU5LEZN6JWC \
+DOMAIN_NAME=thedawgs2025.click \
+ROUTE53_ZONE_ID=Z0717862367KSPKDBWGDE \
+ACM_CERT_ARN=arn:aws:acm:us-east-1:778185677715:certificate/2f0cbfa1-c185-4e79-bfb5-beeebb2e1cf4 \
+WAF_WEB_ACL_ARN=arn:aws:wafv2:us-east-1:778185677715:global/webacl/lab-cf-waf01/6f7ea389-33c8-4f7c-a1b1-b86ef88b1ab6 \
+LOG_BUCKET=lab-alb-logs-778185677715 \
+ORIGIN_SG_ID=sg-0a4a1f67bd5ca8eee \
+./run_all_gates_alb.sh
+
+=== jq summary ===
+jq: parse error: Invalid string: control characters from U+0000 through U+001F must be escaped at line 26, column 69
+
+
+===== SEIR Lab 2 Gate Summary =====
+BADGE:  RED  (written to badge.txt)
+RESULT: FAIL
+JSON:   gate_result.json
+PR:     pr_comment.md
+===================================
+
+
+### SEIR Lab 2 Gate Result: **RED** (FAIL)
+
+**Domain:** `thedawgs2025.click`  
+**CloudFront:** `E23IU5LEZN6JWC` (domain: `d2bxtlbua9poar.cloudfront.net`)  
+**WAF required:** `true`  
+**Logging required:** `true`  
+**Origin SG:** `sg-0a4a1f67bd5ca8eee`  
+
+**SLA**
+- target: `24h`
+- first_seen: `2026-02-28T04:14:05Z`
+- due: `2026-03-01T04:14:05Z`
+- breached: `false`
+
+**Failures (fix in order)**
+- FAIL: No WAF WebACL associated with CloudFront distribution.
+- FAIL: Route53 A alias does not point to CloudFront (expected=d2bxtlbua9poar.cloudfront.net, actual=d2bxtlbua9poar.cloudfront.net.).
+- FAIL: Route53 AAAA alias record not found for thedawgs2025.click.
+- FAIL: CloudFront logging not enabled (DistributionConfig.Logging.Bucket missing).
+- FAIL: Origin SG sg-0a4a1f67bd5ca8eee allows port 443 from the world (0.0.0.0/0 or ::/0).
+
+**Warnings**
+- WARN: Origin SG sg-0a4a1f67bd5ca8eee has no visible sources on port 80 (check prefix lists / LB SG chaining).
+
+> Reminder: Hennessy does not fix Route53 alias records. Evidence does.
+
+
+Troubleshooting:
+
+aws cloudfront list-distributions \
+  --query "DistributionList.Items[*].{ID:Id,Domain:DomainName,Status:Status}" \
+  --output table
+
+-----------------------------------------------------------------
+|                       ListDistributions                       |
++--------------------------------+------------------+-----------+
+|             Domain             |       ID         |  Status   |
++--------------------------------+------------------+-----------+
+|  d2o9k0m8cgfeqk.cloudfront.net |  EF9RXTH4Z8521   |  Deployed |
+|  d3j2a7kxjk7ljp.cloudfront.net |  E2VIZF2BRPKN7J  |  Deployed |
+|  d2hziwdrq6u1ju.cloudfront.net |  E135QEYU4M9REV  |  Deployed |
+|  d2bxtlbua9poar.cloudfront.net |  E23IU5LEZN6JWC  |  Deployed |
++--------------------------------+------------------+-----------+
+
+ aws ec2 describe-security-groups \
+  --group-ids sg-0a4a1f67bd5ca8eee \
+  --query "SecurityGroups[0].IpPermissions" \
+  --output json | jq 'length'
+2
+
+ aws ec2 describe-security-groups \
+  --group-ids sg-0a4a1f67bd5ca8eee \
+  --query "SecurityGroups[0].IpPermissions" \
+  --output json | jq '[.[] | {from: .FromPort, to: .ToPort, proto: .IpProtocol, cidrs: [.IpRanges[].CidrIp], prefixes: [.PrefixListIds[].PrefixListId]}]'
+[
+  {
+    "from": 80,
+    "to": 80,
+    "proto": "tcp",
+    "cidrs": [],
+    "prefixes": [
+      "pl-3b927c52"
+    ]
+  },
+  {
+    "from": 443,
+    "to": 443,
+    "proto": "tcp",
+    "cidrs": [
+      "0.0.0.0/0"
+    ],
+    "prefixes": [
+      "pl-3b927c52"
+    ]
+  }
+]
+
+
+aws ec2 revoke-security-group-ingress \
+  --group-id sg-0a4a1f67bd5ca8eee \
+  --protocol tcp \
+  --port 443 \
+  --cidr 0.0.0.0/0
+{
+    "Return": true,
+    "RevokedSecurityGroupRules": [
+        {
+            "SecurityGroupRuleId": "sgr-0de96e1da2d5b0693",
+            "GroupId": "sg-0a4a1f67bd5ca8eee",
+            "IsEgress": false,
+            "IpProtocol": "tcp",
+            "FromPort": 443,
+            "ToPort": 443,
+            "CidrIpv4": "0.0.0.0/0"
+        }
+    ]
+}
+
+from tfstate:
+
+
+grep -rn "0.0.0.0/0" *.tf
+bonus_a.tf:62:  cidr_ipv4         = "0.0.0.0/0"
+bonus_a.tf:70:  cidr_ipv4         = "0.0.0.0/0"
+bonus_b.tf:20:  # TODO: students add inbound 80/443 from 0.0.0.0/0
+bonus_b.tf:30:  # Lab 2A: locked from 0.0.0.0/0 to CloudFront managed prefix list only.
+bonus_b.tf:41:  # Lab 2A: locked from 0.0.0.0/0 to CloudFront managed prefix list only.
+bonus_b.tf:54:  cidr_ipv4         = "0.0.0.0/0"
+bonus_b.tf:58:# alb_sg02 removed — it allowed 0.0.0.0/0 on port 443 which fails the gate check.
+bonus_b.tf:81:# EC2 ingress from alb_sg02 removed — sg02 was deleted (it allowed 0.0.0.0/0 on 443).
+cloudfront-lab-2a-distribution.tf:11:#   - Replaces the open 0.0.0.0/0 ALB SG
+cloudfront-lab-2a-distribution.tf:44:  # Using this instead of 0.0.0.0/0 means only CloudFront
+cloudfront-lab-2a-distribution.tf:389:# The 0.0.0.0/0 ingress rules are updated
+lab-2a-origin-cloaking.tf:18:# FIX: Allow 0.0.0.0/0 on 443 so direct hits reach the ALB listener.
+lab-2a-origin-cloaking.tf:37:  cidr_blocks       = ["0.0.0.0/0"]
+main.tf:99:# Explanation: This route is the Kessel Run—0.0.0.0/0 goes out the IGW.
+main.tf:102:  destination_cidr_block = "0.0.0.0/0"
+main.tf:125:  destination_cidr_block = "0.0.0.0/0"
+main.tf:174:  cidr_ipv4         = "0.0.0.0/0"
+main.tf:201:  cidr_ipv4         = "0.0.0.0/0"
+
+
+ chmod +x run_all_gates_alb.sh
+
+ORIGIN_REGION=us-east-1 \
+CF_DISTRIBUTION_ID=E23IU5LEZN6JWC \
+DOMAIN_NAME=thedawgs2025.click \
+ROUTE53_ZONE_ID=Z0717862367KSPKDBWGDE \
+ACM_CERT_ARN=arn:aws:acm:us-east-1:778185677715:certificate/2f0cbfa1-c185-4e79-bfb5-beeebb2e1cf4 \
+WAF_WEB_ACL_ARN=arn:aws:wafv2:us-east-1:778185677715:global/webacl/lab-cf-waf01/6f7ea389-33c8-4f7c-a1b1-b86ef88b1ab6 \
+LOG_BUCKET=lab-alb-logs-778185677715 \
+ORIGIN_SG_ID=sg-0a4a1f67bd5ca8eee \
+./run_all_gates_alb.sh
+
+=== jq summary ===
+jq: parse error: Invalid string: control characters from U+0000 through U+001F must be escaped at line 26, column 69
+
+
+===== SEIR Lab 2 Gate Summary =====
+BADGE:  RED  (written to badge.txt)
+RESULT: FAIL
+JSON:   gate_result.json
+PR:     pr_comment.md
+===================================
+
+
+### SEIR Lab 2 Gate Result: **RED** (FAIL)
+
+**Domain:** `thedawgs2025.click`  
+**CloudFront:** `E23IU5LEZN6JWC` (domain: `d2bxtlbua9poar.cloudfront.net`)  
+**WAF required:** `true`  
+**Logging required:** `true`  
+**Origin SG:** `sg-0a4a1f67bd5ca8eee`  
+
+**SLA**
+- target: `24h`
+- first_seen: `2026-02-28T04:14:05Z`
+- due: `2026-03-01T04:14:05Z`
+- breached: `false`
+
+**Failures (fix in order)**
+- FAIL: No WAF WebACL associated with CloudFront distribution.
+- FAIL: Route53 A alias does not point to CloudFront (expected=d2bxtlbua9poar.cloudfront.net, actual=d2bxtlbua9poar.cloudfront.net.).
+- FAIL: Route53 AAAA alias does not point to CloudFront (expected=d2bxtlbua9poar.cloudfront.net, actual=d2bxtlbua9poar.cloudfront.net.).
+
+**Warnings**
+- WARN: CloudFront logs bucket differs (expected=lab-alb-logs-778185677715.s3.amazonaws.com, actual=lab-cf-logs-778185677715.s3.amazonaws.com).
+- WARN: Origin SG sg-0a4a1f67bd5ca8eee has no visible sources on port 443 (check prefix lists / LB SG chaining).
+- WARN: Origin SG sg-0a4a1f67bd5ca8eee has no visible sources on port 80 (check prefix lists / LB SG chaining).
+
+> Reminder: Hennessy does not fix Route53 alias records. Evidence does.
+
+
+Troubleshooting:
+
+ aws cloudfront get-distribution-config --id E23IU5LEZN6JWC \
+  --query "DistributionConfig.WebAclId"
+null
+
+aws route53 list-resource-record-sets \
+  --hosted-zone-id Z0717862367KSPKDBWGDE \
+  --query "ResourceRecordSets[?Name=='thedawgs2025.click.']" \
+  --output json
+[
+    {
+        "Name": "thedawgs2025.click.",
+        "Type": "A",
+        "AliasTarget": {
+            "HostedZoneId": "Z2FDTNDATAQYW2",
+            "DNSName": "d2bxtlbua9poar.cloudfront.net.",
+            "EvaluateTargetHealth": false
+        }
+    },
+    {
+        "Name": "thedawgs2025.click.",
+        "Type": "AAAA",
+        "AliasTarget": {
+            "HostedZoneId": "Z2FDTNDATAQYW2",
+            "DNSName": "d2bxtlbua9poar.cloudfront.net.",
+            "EvaluateTargetHealth": false
+        }
+    },
+    {
+        "Name": "thedawgs2025.click.",
+        "Type": "NS",
+        "TTL": 172800,
+        "ResourceRecords": [
+            {
+                "Value": "ns-1276.awsdns-31.org."
+            },
+            {
+                "Value": "ns-1882.awsdns-43.co.uk."
+            },
+            {
+                "Value": "ns-974.awsdns-57.net."
+            },
+            {
+                "Value": "ns-185.awsdns-23.com."
+            }
+        ]
+    },
+    {
+        "Name": "thedawgs2025.click.",
+        "Type": "SOA",
+        "TTL": 900,
+        "ResourceRecords": [
+            {
+                "Value": "ns-1276.awsdns-31.org. awsdns-hostmaster.amazon.com. 1 7200 900 1209600 86400"
+            }
+        ]
+    }
+]
+
+
+ aws wafv2 list-web-acls --scope CLOUDFRONT --region us-east-1 \
+  --query "WebACLs[*].{Name:Name,ARN:ARN}" --output table
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+|                                                                       ListWebACLs                                                                      |
++------------------------------------------------------------------------------------------------------------------------+-------------------------------+
+|                                                           ARN
+                                         |             Name              |
++------------------------------------------------------------------------------------------------------------------------+-------------------------------+
+|  arn:aws:wafv2:us-east-1:778185677715:global/webacl/CreatedByCloudFront-7cd0c80c/171822dc-4fdf-4915-b902-7648dd028b1e  |  CreatedByCloudFront-7cd0c80c |
+|  arn:aws:wafv2:us-east-1:778185677715:global/webacl/CreatedByCloudFront-acd95120/c1b6ff87-352f-4093-9a15-b04a629323e3  |  CreatedByCloudFront-acd95120 |
+|  arn:aws:wafv2:us-east-1:778185677715:global/webacl/CreatedByCloudFront-ba298982/4d636d7e-a798-4a2d-8b7f-eacafc327760  |  CreatedByCloudFront-ba298982 |
+|  arn:aws:wafv2:us-east-1:778185677715:global/webacl/lab-cf-waf01/6f7ea389-33c8-4f7c-a1b1-b86ef88b1ab6                  |  lab-cf-waf01                 |
++------------------------------------------------------------------------------------------------------------------------+-------------------------------+
+
+aws cloudfront get-distribution-config --id E23IU5LEZN6JWC > /tmp/dist-config.json
+ETAG=$(jq -r '.ETag' /tmp/dist-config.json)
+
+ aws cloudfront update-distribution \
+  --id E23IU5LEZN6JWC \
+  --distribution-config file:///tmp/updated-dist-config.json \
+  --if-match $ETAG
+
+Error parsing parameter '--distribution-config': Unable to load paramfile file:///tmp/updated-dist-config.json: [Errno 2] No such file or directory: '/tmp/updated-dist-config.json'
+
+ jq '.DistributionConfig.WebAclId = "arn:aws:wafv2:us-east-1:778185677715:global/webacl/lab-cf-waf01/6f7ea389-33c8-4f7c-a1b1-b86ef88b1ab6"' \
+  /tmp/dist-config.json | jq '.DistributionConfig' > /tmp/updated-dist-config.json
+
+ aws cloudfront update-distribution \
+  --id E23IU5LEZN6JWC \
+  --distribution-config file:///tmp/updated-dist-config.json \
+  --if-match $ETAG
+
+Error parsing parameter '--distribution-config': Unable to load paramfile file:///tmp/updated-dist-config.json: [Errno 2] No such file or directory: '/tmp/updated-dist-config.json'
+
+grep -r "enable_cloudfront_waf\|web_acl_id\|WebAclId" *.tf *.tfvars 2>/dev/null
+cloudfront-lab-2a-distribution.tf:  web_acl_id = var.enable_cloudfront_waf ? aws_wafv2_web_acl.dawgs-armageddon_cf_waf01[0].arn : null
+cloudfront-lab-2a-outputs.tf:  description = "ARN of the CloudFront-scoped WAFv2 Web ACL. Only populated when enable_cloudfront_waf=true."
+cloudfront-lab-2a-outputs.tf:  value       = var.enable_cloudfront && var.enable_cloudfront_waf ? aws_wafv2_web_acl.dawgs-armageddon_cf_waf01[0].arn : null
+cloudfront-lab-2a-outputs.tf:  value       = var.enable_cloudfront && var.enable_cloudfront_waf ? aws_cloudwatch_log_group.dawgs-armageddon_cf_waf_log_group01[0].name : null
+cloudfront-variables.tf:variable "enable_cloudfront_waf" {
+cloufront-lab-2a-waf.tf:  count = var.enable_cloudfront && var.enable_cloudfront_waf ? 1 : 0
+cloufront-lab-2a-waf.tf:  count = var.enable_cloudfront && var.enable_cloudfront_waf ? 1 : 0
+cloufront-lab-2a-waf.tf:  count = var.enable_cloudfront && var.enable_cloudfront_waf ? 1 : 0
+cloufront-lab-2a-waf.tf:# NOTE: CloudFront WAF is attached via web_acl_id inside the distribution resource.
+cloufront-lab-2a-waf.tf:# See cloudfront-lab-2a-distribution.tf: web_acl_id = aws_wafv2_web_acl.dawgs-armageddon_cf_waf01[0].arn
+
+
+ jq '.DistributionConfig.WebAclId = "arn:aws:wafv2:us-east-1:778185677715:global/webacl/lab-cf-waf01/6f7ea389-33c8-4f7c-a1b1-b86ef88b1ab6"' \
+  /tmp/dist-config.json | jq '.DistributionConfig' > /tmp/updated-dist-config.json
+
+cat /tmp/updated-dist-config.json | head -5
+{
+  "CallerReference": "terraform-20260301010501688200000010",
+  "Aliases": {
+    "Quantity": 2,
+    "Items": [
+
+terraform state show 'aws_cloudfront_distribution.dawgs-armageddon_cf01[0]' | grep web_acl
+    web_acl_id                      = "arn:aws:wafv2:us-east-1:778185677715:global/webacl/lab-cf-waf01/6f7ea389-33c8-4f7c-a1b1-b86ef88b1ab6"
+
+
+#####
+
+chmod +x run_all_gates_alb.sh
+
+ORIGIN_REGION=us-east-1 \
+CF_DISTRIBUTION_ID=E23IU5LEZN6JWC \
+DOMAIN_NAME=thedawgs2025.click \
+ROUTE53_ZONE_ID=Z0717862367KSPKDBWGDE \
+ACM_CERT_ARN=arn:aws:acm:us-east-1:778185677715:certificate/2f0cbfa1-c185-4e79-bfb5-beeebb2e1cf4 \
+WAF_WEB_ACL_ARN=arn:aws:wafv2:us-east-1:778185677715:global/webacl/lab-cf-waf01/6f7ea389-33c8-4f7c-a1b1-b86ef88b1ab6 \
+LOG_BUCKET=lab-cf-logs-778185677715 \
+ORIGIN_SG_ID=sg-0a4a1f67bd5ca8eee \
+./run_all_gates_alb.sh
+
+=== jq summary ===
+jq: parse error: Invalid string: control characters from U+0000 through U+001F must be escaped at line 26, column 69
+
+
+===== SEIR Lab 2 Gate Summary =====
+BADGE:  RED  (written to badge.txt)
+RESULT: FAIL
+JSON:   gate_result.json
+PR:     pr_comment.md
+===================================
+### SEIR Lab 2 Gate Result: **RED** (FAIL)
+
+**Domain:** `thedawgs2025.click`  
+**CloudFront:** `E23IU5LEZN6JWC` (domain: `d2bxtlbua9poar.cloudfront.net`)  
+**WAF required:** `true`  
+**Logging required:** `true`  
+**Origin SG:** `sg-0a4a1f67bd5ca8eee`  
+
+**SLA**
+- target: `24h`
+- first_seen: `2026-02-28T04:14:05Z`
+- due: `2026-03-01T04:14:05Z`
+- breached: `false`
+
+**Failures (fix in order)**
+- FAIL: No WAF WebACL associated with CloudFront distribution.
+- FAIL: Route53 A alias does not point to CloudFront (expected=d2bxtlbua9poar.cloudfront.net, actual=d2bxtlbua9poar.cloudfront.net.).
+- FAIL: Route53 AAAA alias does not point to CloudFront (expected=d2bxtlbua9poar.cloudfront.net, actual=d2bxtlbua9poar.cloudfront.net.).
+
+**Warnings**
+- WARN: CloudFront logs bucket differs (expected=lab-alb-logs-778185677715.s3.amazonaws.com, actual=lab-cf-logs-778185677715.s3.amazonaws.com).
+- WARN: Origin SG sg-0a4a1f67bd5ca8eee has no visible sources on port 443 (check prefix lists / LB SG chaining).
+- WARN: Origin SG sg-0a4a1f67bd5ca8eee has no visible sources on port 80 (check prefix lists / LB SG chaining).
+
+> Reminder: Hennessy does not fix Route53 alias records. Evidence does.
+
+#####
+
+grep -n "cloudfront\|alias\|DNSName\|actual\|expected" run_all_gates_alb.sh | head -30
+19:# - Route53 alias HostedZoneId for CloudFront is constant: Z2FDTNDATAQYW2
+41:# Optional: expected WAFv2 Web ACL ARN (scope CLOUDFRONT). If omitted, we still verify association exists.
+154:cf_json="$(aws cloudfront get-distribution --id "$CF_DISTRIBUTION_ID" 2>/dev/null || true)"
+162:cf_enabled="$(aws cloudfront get-distribution --id "$CF_DISTRIBUTION_ID" \
+164:cf_status="$(aws cloudfront get-distribution --id "$CF_DISTRIBUTION_ID" \
+166:cf_domain="$(aws cloudfront get-distribution --id "$CF_DISTRIBUTION_ID" \
+168:cf_aliases="$(aws cloudfront get-distribution --id "$CF_DISTRIBUTION_ID" \
+184:# Check: alias contains domain
+185:if echo "$cf_aliases" | tr '\t' '\n' | grep -qi "^${DOMAIN_NAME}$"; then
+186:  add_detail "PASS: CloudFront aliases include domain ($DOMAIN_NAME)."
+188:  add_failure "FAIL: CloudFront aliases do NOT include domain ($DOMAIN_NAME)."
+192:viewer_cert_source="$(aws cloudfront get-distribution --id "$CF_DISTRIBUTION_ID" \
+194:viewer_acm_arn="$(aws cloudfront get-distribution --id "$CF_DISTRIBUTION_ID" \
+196:min_tls="$(aws cloudfront get-distribution --id "$CF_DISTRIBUTION_ID" \
+202:    add_warning "WARN: CloudFront ACM ARN differs from ACM_CERT_ARN input (expected=$ACM_CERT_ARN, actual=$viewer_acm_arn)."
+244:# arn:aws:cloudfront::<account-id>:distribution/<distribution-id>
+248:  cf_resource_arn="arn:aws:cloudfront::${account_id}:distribution/${CF_DISTRIBUTION_ID}"
+258:        add_warning "WARN: Associated WebACL ARN differs from WAF_WEB_ACL_ARN input (expected=$WAF_WEB_ACL_ARN, actual=$waf_assoc_arn)."
+281:# ---------- Route53 alias checks ----------
+283:# and use CF alias zone id.
+291:check_alias_record() {
+299:    --query "ResourceRecordSets[?Type=='$type' && (Name=='$name_fqdn' || Name=='$DOMAIN_NAME')].AliasTarget.DNSName" \
+308:    add_failure "FAIL: Route53 $type alias record not found for $DOMAIN_NAME."
+314:    add_detail "PASS: Route53 $type alias points to CloudFront ($target)."
+316:    add_failure "FAIL: Route53 $type alias does not point to CloudFront (expected=$target, actual=$found_target)."
+320:    add_detail "PASS: Route53 $type alias HostedZoneId is CloudFront ($CF_ROUTE53_ALIAS_ZONE_ID)."
+322:    add_warning "WARN: Route53 $type alias HostedZoneId is not CloudFront constant (expected=$CF_ROUTE53_ALIAS_ZONE_ID, actual=$found_zone)."
+326:check_alias_record "A"
+327:check_alias_record "AAAA"
+330:logging_bucket="$(aws cloudfront get-distribution --id "$CF_DISTRIBUTION_ID" \
+
+####
+
+ CF_DISTRIBUTION_ID=E23IU5LEZN6JWC DOMAIN_NAME=thedawgs2025.click ROUTE53_ZONE_ID=Z0717862367KSPKDBWGDE ACM_CERT_ARN=arn:aws:acm:us-east-1:778185677715:certificate/2f0cbfa1-c185-4e79-bfb5-beeebb2e1cf4 WAF_WEB_ACL_ARN=arn:aws:wafv2:us-east-1:778185677715:global/webacl/lab-cf-waf01/6f7ea389-33c8-4f7c-a1b1-b86ef88b1ab6 LOG_BUCKET=lab-cf-logs-778185677715 ./run_all_gates_alb.sh
+
+=== jq summary ===
+jq: parse error: Invalid string: control characters from U+0000 through U+001F must be escaped at line 26, column 69
+
+
+===== SEIR Lab 2 Gate Summary =====
+BADGE:  RED  (written to badge.txt)
+RESULT: FAIL
+JSON:   gate_result.json
+PR:     pr_comment.md
+===================================
+
+### SEIR Lab 2 Gate Result: **RED** (FAIL)
+
+**Domain:** `thedawgs2025.click`  
+**CloudFront:** `E23IU5LEZN6JWC` (domain: `d2bxtlbua9poar.cloudfront.net`)  
+**WAF required:** `true`  
+**Logging required:** `true`  
+**Origin SG:** `sg-0a4a1f67bd5ca8eee`  
+
+**SLA**
+- target: `24h`
+- first_seen: `2026-02-28T04:14:05Z`
+- due: `2026-03-01T04:14:05Z`
+- breached: `true`
+
+**Failures (fix in order)**
+- FAIL: No WAF WebACL associated with CloudFront distribution.
+- FAIL: Route53 A alias does not point to CloudFront (expected=d2bxtlbua9poar.cloudfront.net, actual=d2bxtlbua9poar.cloudfront.net.).
+- FAIL: Route53 AAAA alias does not point to CloudFront (expected=d2bxtlbua9poar.cloudfront.net, actual=d2bxtlbua9poar.cloudfront.net.).
+
+**Warnings**
+- WARN: CloudFront logs bucket differs (expected=lab-cf-logs-778185677715.s3.amazonaws.com, actual=lab-cf-logs-778185677715.s3.amazonaws.com).
+- WARN: Origin SG sg-0a4a1f67bd5ca8eee has no visible sources on port 443 (check prefix lists / LB SG chaining).
+- WARN: Origin SG sg-0a4a1f67bd5ca8eee has no visible sources on port 80 (check prefix lists / LB SG chaining).
+
+> Reminder: Hennessy does not fix Route53 alias records. Evidence does.
+
+#####
+
+ CF_DISTRIBUTION_ID=E23IU5LEZN6JWC DOMAIN_NAME=thedawgs2025.click ROUTE53_ZONE_ID=Z0717862367KSPKDBWGDE ACM_CERT_ARN=arn:aws:acm:us-east-1:778185677715:certificate/2f0cbfa1-c185-4e79-bfb5-beeebb2e1cf4 WAF_WEB_ACL_ARN=arn:aws:wafv2:us-east-1:778185677715:global/webacl/lab-cf-waf01/6f7ea389-33c8-4f7c-a1b1-b86ef88b1ab6 LOG_BUCKET=lab-cf-logs-778185677715 ./run_all_gates_alb.sh
+
+=== jq summary ===
+jq: parse error: Invalid string: control characters from U+0000 through U+001F must be escaped at line 26, column 69
+
+
+===== SEIR Lab 2 Gate Summary =====
+BADGE:  RED  (written to badge.txt)
+RESULT: FAIL
+JSON:   gate_result.json
+PR:     pr_comment.md
+===================================
+
+### SEIR Lab 2 Gate Result: **RED** (FAIL)
+
+**Domain:** `thedawgs2025.click`  
+**CloudFront:** `E23IU5LEZN6JWC` (domain: `d2bxtlbua9poar.cloudfront.net`)  
+**WAF required:** `true`  
+**Logging required:** `true`  
+**Origin SG:** `sg-07b21d33dfea24a2b`  
+
+**SLA**
+- target: `24h`
+- first_seen: `2026-02-28T04:14:05Z`
+- due: `2026-03-01T04:14:05Z`
+- breached: `true`
+
+**Failures (fix in order)**
+- FAIL: Origin SG not found or not accessible (sg-07b21d33dfea24a2b).
+
+**Warnings**
+- WARN: CloudFront logs bucket differs (expected=lab-cf-logs-778185677715.s3.amazonaws.com, actual=lab-cf-logs-778185677715.s3.amazonaws.com).
+- WARN: Origin SG sg-07b21d33dfea24a2b has no visible sources on port 443 (check prefix lists / LB SG chaining).
+- WARN: Origin SG sg-07b21d33dfea24a2b has no visible sources on port 80 (check prefix lists / LB SG chaining).
+
+> Reminder: Hennessy does not fix Route53 alias records. Evidence does.
+
+chmod +x run_all_gates_alb.sh
+
+ORIGIN_REGION=us-east-1 \
+CF_DISTRIBUTION_ID=E23IU5LEZN6JWC \
+DOMAIN_NAME=thedawgs2025.click \
+ROUTE53_ZONE_ID=Z0717862367KSPKDBWGDE \
+ACM_CERT_ARN=arn:aws:acm:us-east-1:778185677715:certificate/2f0cbfa1-c185-4e79-bfb5-beeebb2e1cf4 \
+WAF_WEB_ACL_ARN=arn:aws:wafv2:us-east-1:778185677715:global/webacl/lab-cf-waf01/6f7ea389-33c8-4f7c-a1b1-b86ef88b1ab6 \
+LOG_BUCKET=lab-cf-logs-778185677715 \
+ORIGIN_SG_ID=sg-0a4a1f67bd5ca8eee \
+./run_all_gates_alb.sh
+
+=== jq summary ===
+jq: parse error: Invalid string: control characters from U+0000 through U+001F must be escaped at line 26, column 69
+
+
+===== SEIR Lab 2 Gate Summary =====
+BADGE:  YELLOW  (written to badge.txt)
+RESULT: PASS
+JSON:   gate_result.json
+PR:     pr_comment.md
+===================================
+
+
+### SEIR Lab 2 Gate Result: **YELLOW** (PASS)
+
+**Domain:** `thedawgs2025.click`  
+**CloudFront:** `E23IU5LEZN6JWC` (domain: `d2bxtlbua9poar.cloudfront.net`)  
+**WAF required:** `true`  
+**Logging required:** `true`  
+**Origin SG:** `sg-0a4a1f67bd5ca8eee`  
+
+**SLA**
+- target: `24h`
+- first_seen: ``
+- due: ``
+- breached: `false`
+
+**Failures (fix in order)**
+- (none)
+
+**Warnings**
+- WARN: CloudFront logs bucket differs (expected=lab-cf-logs-778185677715.s3.amazonaws.com, actual=lab-cf-logs-778185677715.s3.amazonaws.com).
+- WARN: Origin SG sg-0a4a1f67bd5ca8eee has no visible sources on port 443 (check prefix lists / LB SG chaining).
+- WARN: Origin SG sg-0a4a1f67bd5ca8eee has no visible sources on port 80 (check prefix lists / LB SG chaining).
+
+
+
+Found in variables the wrong security group was being read. 80 and 443 have separate sec groups for rule set limit issue of 60 per security group.

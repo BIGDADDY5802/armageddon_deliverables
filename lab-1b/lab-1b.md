@@ -279,7 +279,3 @@ curl http://98.80.204.135/list
 
 aws cloudwatch describe-alarms \
   --alarm-name-prefix lab-db-connection
-
-
-
-

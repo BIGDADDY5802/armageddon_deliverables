@@ -1,0 +1,706 @@
+#2026.3.1_armageddon_work
+
+Outputs:
+
+alb_direct_url_for_403_test = "https://lab-alb01-1197784243.us-east-1.elb.amazonaws.com"
+app_url_http = "http://app.thedawgs2025.click"
+app_url_https = "https://app.thedawgs2025.click"
+app_urls = {
+  "alb_direct" = "http://lab-alb01-1197784243.us-east-1.elb.amazonaws.com"
+  "http" = "http://app.thedawgs2025.click"
+  "https" = "https://app.thedawgs2025.click"
+}
+base_domain = "thedawgs2025.click"
+cloudfront_acm_cert_arn = "arn:aws:acm:us-east-1:778185677715:certificate/815b44ed-fd74-4cf5-98b0-07b684816090"
+cloudfront_app_url = "https://app.thedawgs2025.click"
+cloudfront_distribution_arn = "arn:aws:cloudfront::778185677715:distribution/E3S9XAC2ISOB35"
+cloudfront_distribution_domain = "d2u8h7yd456bsu.cloudfront.net"
+cloudfront_distribution_id = "E3S9XAC2ISOB35"
+cloudfront_distribution_status = "Deployed"
+cloudfront_logs_bucket = "lab-cf-logs-778185677715"
+cloudfront_origin_header_name = "X-Origin-Verify"
+cloudfront_origin_secret_hint = "(set — see var.cloudfront_origin_secret)"
+cloudfront_raw_domain_url = "https://d2u8h7yd456bsu.cloudfront.net"
+cloudfront_waf_acl_arn = "arn:aws:wafv2:us-east-1:778185677715:global/webacl/lab-cf-waf01/07e16f9d-a77e-42e1-bc25-4918f00f4712"
+cloudfront_waf_log_group = "aws-waf-logs-lab-cf-webacl01"
+dawgs-armageddon_acm_cert_arn = "arn:aws:acm:us-east-1:778185677715:certificate/197c590c-b669-4fe5-8b25-19e1a92b2dcb"
+dawgs-armageddon_alb_dns_name = "lab-alb01-1197784243.us-east-1.elb.amazonaws.com"
+dawgs-armageddon_apex_url_https = "https://thedawgs2025.click"
+dawgs-armageddon_dashboard_name = "lab-dashboard01"
+dawgs-armageddon_ec2_instance_id = "i-0375c55ce9ecc99f4"
+dawgs-armageddon_ec2_private_instance_id = "i-060153d665ab5d43b"
+dawgs-armageddon_log_group_name = "/aws/ec2/lab-rds-app"
+dawgs-armageddon_private_subnet_ids = [
+  "subnet-0be8e348836e62d97",
+  "subnet-0a45d64502faba34c",
+]
+dawgs-armageddon_public_subnet_ids = [
+  "subnet-0095a6df35b768fc4",
+  "subnet-0ce83c924532f6144",
+]
+dawgs-armageddon_rds_endpoint = "lab-rds01.c89ykq22i31z.us-east-1.rds.amazonaws.com"
+dawgs-armageddon_sns_topic_arn = "arn:aws:sns:us-east-1:778185677715:lab-db-incidents"
+dawgs-armageddon_target_group_arn = "arn:aws:elasticloadbalancing:us-east-1:778185677715:targetgroup/lab-tg01/f28a668d7d89cf36"
+dawgs-armageddon_vpc_id = "vpc-0c5f8069956f84784"
+dawgs-armageddon_waf_arn = "arn:aws:wafv2:us-east-1:778185677715:regional/webacl/lab-waf01/d7905702-c4b4-4a6b-a18e-8b1f482f1ca1"
+dawgs-armageddon_waf_log_destination = "cloudwatch"
+gate_acm_cert_arn = "arn:aws:acm:us-east-1:778185677715:certificate/815b44ed-fd74-4cf5-98b0-07b684816090"
+gate_cf_distribution_id = "E3S9XAC2ISOB35"
+gate_command = "CF_DISTRIBUTION_ID=E3S9XAC2ISOB35 DOMAIN_NAME=thedawgs2025.click ROUTE53_ZONE_ID=Z0717862367KSPKDBWGDE ACM_CERT_ARN=arn:aws:acm:us-east-1:778185677715:certificate/815b44ed-fd74-4cf5-98b0-07b684816090 WAF_WEB_ACL_ARN=arn:aws:wafv2:us-east-1:778185677715:global/webacl/lab-cf-waf01/07e16f9d-a77e-42e1-bc25-4918f00f4712 LOG_BUCKET=lab-cf-logs-778185677715 ./run_all_gates_alb.sh"
+gate_domain_name = "thedawgs2025.click"
+gate_log_bucket = "lab-cf-logs-778185677715"
+gate_route53_zone_id = "Z0717862367KSPKDBWGDE"
+gate_waf_web_acl_arn = "arn:aws:wafv2:us-east-1:778185677715:global/webacl/lab-cf-waf01/07e16f9d-a77e-42e1-bc25-4918f00f4712"
+lb_url = "http://lab-alb01-1197784243.us-east-1.elb.amazonaws.com"
+
+aws ec2 describe-security-groups \
+  --filters "Name=vpc-id,Values=vpc-0c5f8069956f84784" "Name=group-name,Values=lab*" \
+  --query 'SecurityGroups[*].[GroupName,GroupId]' \
+  --output table
+-------------------------------------------
+|         DescribeSecurityGroups          |
++----------------+------------------------+
+|  lab-alb-sg02  |  sg-098f9ef5b770b6974  |
+|  lab-vpce-sg01 |  sg-092137dae03bfe9ce  |
+|  lab-ec2-sg01  |  sg-015fee619016b04ca  |
+|  lab-rds-sg01  |  sg-02db7a0f5fb68b7ae  |
+|  lab-alb-sg01  |  sg-04431b3c5a4c64b7b  |
++----------------+------------------------+
+
+CF_DISTRIBUTION_ID=E3S9XAC2ISOB35 \
+DOMAIN_NAME=thedawgs2025.click \
+ROUTE53_ZONE_ID=Z0717862367KSPKDBWGDE \
+ACM_CERT_ARN=arn:aws:acm:us-east-1:778185677715:certificate/815b44ed-fd74-4cf5-98b0-07b684816090 \
+WAF_WEB_ACL_ARN=arn:aws:wafv2:us-east-1:778185677715:global/webacl/lab-cf-waf01/07e16f9d-a77e-42e1-bc25-4918f00f4712 \
+LOG_BUCKET=lab-cf-logs-778185677715 \
+ORIGIN_SG_ID=sg-098f9ef5b770b6974 \
+./run_all_gates_alb.sh
+
+=== jq summary ===
+jq: parse error: Invalid string: control characters from U+0000 through U+001F must be escaped at line 26, column 69
+
+
+===== SEIR Lab 2 Gate Summary =====
+BADGE:  YELLOW  (written to badge.txt)
+RESULT: PASS
+JSON:   gate_result.json
+PR:     pr_comment.md
+===================================
+
+### SEIR Lab 2 Gate Result: **YELLOW** (PASS)
+
+**Domain:** `thedawgs2025.click`  
+**CloudFront:** `E3S9XAC2ISOB35` (domain: `d2u8h7yd456bsu.cloudfront.net`)  
+**WAF required:** `true`  
+**Logging required:** `true`  
+**Origin SG:** `sg-098f9ef5b770b6974`  
+
+**SLA**
+- target: `24h`
+- first_seen: ``
+- due: ``
+- breached: `false`
+
+**Failures (fix in order)**
+- (none)
+
+**Warnings**
+- WARN: CloudFront logs bucket differs (expected=lab-cf-logs-778185677715.s3.amazonaws.com, actual=lab-cf-logs-778185677715.s3.amazonaws.com).
+- WARN: Origin SG sg-098f9ef5b770b6974 has no visible sources on port 443 (check prefix lists / LB SG chaining).
+- WARN: Origin SG sg-098f9ef5b770b6974 has no visible sources on port 80 (check prefix lists / LB SG chaining).
+
+> Reminder: Hennessy does not fix Route53 alias records. Evidence does.
+
+
+-----
+
+ echo "<html><body><h1>thedawgs2025 - v1</h1></body></html>" > index.html
+aws s3 cp index.html s3://lab-static-778185677715/index.html \
+  --content-type text/html
+upload: .\index.html to s3://lab-static-778185677715/index.html
+
+curl -si https://thedawgs2025.click/static/index.html | head -20
+HTTP/1.1 403 Forbidden
+Content-Type: application/xml
+Transfer-Encoding: chunked
+Connection: keep-alive
+Server: AmazonS3
+Date: Sun, 01 Mar 2026 20:01:53 GMT
+X-Cache: Error from cloudfront
+Via: 1.1 90c60c521df11e3787114b5b54138ac0.cloudfront.net (CloudFront)
+X-Amz-Cf-Pop: DFW59-P6
+Alt-Svc: h3=":443"; ma=86400
+X-Amz-Cf-Id: 7-wD0_UuQeXDBKM0WWkw4r1cX6zkwlxBy2Pfri-qTBgwsg2EiuxOGw==
+Cache-Control: public, max-age=31536000, immutable
+
+<?xml version="1.0" encoding="UTF-8"?>
+<Error><Code>AccessDenied</Code><Message>Access Denied</Message></Error>
+
+
+aws s3api put-bucket-policy --bucket lab-static-778185677715 --policy '{
+  aws s3api put-bucket-policy --bucket lab-static-778185677715 --policy '{
+  "Version": "2012-10-17",
+  "Statement": [
+    { "Sid": "AllowCloudFrontOAC",
+      "Sid": "AllowCloudFrontOAC",
+      "Effect": "Allow",vice": "cloudfront.amazonaws.com"},
+      "Principal": {"Service": "cloudfront.amazonaws.com"},
+      "Action": "s3:GetObject",:lab-static-778185677715/*",
+      "Resource": "arn:aws:s3:::lab-static-778185677715/*",
+      "Condition": {s": {
+        "StringEquals": {: "arn:aws:cloudfront::778185677715:distribution/E3S9XA          "AWS:SourceArn": "arn:aws:cloudfront::778185677715:distribution/E3S9XAC2ISOB35"
+        }
+      }
+    },
+    { "Sid": "TempDebugAllow",
+      "Sid": "TempDebugAllow",
+      "Effect": "Allow",
+      "Principal": "*",Object",
+      "Action": "s3:GetObject",:lab-static-778185677715/*"
+      "Resource": "arn:aws:s3:::lab-static-778185677715/*"
+    }
+  ]
+}'
+
+An error occurred (AccessDenied) when calling the PutBucketPolicy operation: User: arn:aws:iam::778185677715:user/awscli is not authorized to perform: s3:PutBucketPolicy on resource: "arn:aws:s3:::lab-static-778185677715" because public policies are prevented by the BlockPublicPolicy setting in S3 Block Public Access.
+
+
+aws s3api get-bucket-ownership-controls \
+  --bucket lab-static-778185677715 \
+  --query "OwnershipControls.Rules"
+[
+    {
+        "ObjectOwnership": "BucketOwnerEnforced"
+    }
+]
+
+aws s3api put-bucket-ownership-controls \
+  --bucket lab-static-778185677715 \
+  --ownership-controls '{"Rules":[{"ObjectOwnership":"BucketOwnerPreferred"}]}'
+
+ curl -si https://thedawgs2025.click/static/index.html | head -5
+HTTP/1.1 403 Forbidden
+Content-Type: application/xml
+Transfer-Encoding: chunked
+Connection: keep-alive
+Server: AmazonS3
+
+ aws s3api put-public-access-block \
+  --bucket lab-static-778185677715 \
+  --public-access-block-configuration \
+  "BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=false,RestrictPublicBuckets=false"
+
+aws s3api put-bucket-policy --bucket lab-static-778185677715 --policy '{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Sid": "AllowCloudFrontService",
+    "Effect": "Allow",
+    "Principal": {"Service": "cloudfront.amazonaws.com"},
+    "Action": "s3:GetObject",
+    "Resource": "arn:aws:s3:::lab-static-778185677715/*"
+  }]
+}'
+
+ curl -si https://thedawgs2025.click/static/index.html | head -5
+HTTP/1.1 403 Forbidden
+Content-Type: application/xml
+Transfer-Encoding: chunked
+Connection: keep-alive
+Server: AmazonS3
+
+ aws s3api get-public-access-block --bucket lab-static-778185677715
+{
+    "PublicAccessBlockConfiguration": {
+        "BlockPublicAcls": true,
+        "IgnorePublicAcls": true,
+        "BlockPublicPolicy": false,
+        "RestrictPublicBuckets": false
+    }
+}
+
+aws s3 ls s3://lab-static-778185677715/
+2026-03-01 14:01:37         53 index.html
+2026-03-01 13:08:48       5540 user_data.sh
+
+ aws s3api get-bucket-acl --bucket lab-static-778185677715
+{
+    "Owner": {
+        "ID": "3883e92f63ca7f3ea4375dca27f0c0247370e53b03660a8fdb2dc87c877cf725"    },
+    "Grants": [
+        {
+            "Grantee": {
+                "ID": "3883e92f63ca7f3ea4375dca27f0c0247370e53b03660a8fdb2dc87c877cf725",
+                "Type": "CanonicalUser"
+            },
+            "Permission": "FULL_CONTROL"
+        }
+    ]
+}
+
+
+aws s3control get-public-access-block \
+  --account-id 778185677715
+
+An error occurred (NoSuchPublicAccessBlockConfiguration) when calling the GetPublicAccessBlock operation: The public access block configuration was not found
+
+
+ curl -si "https://lab-static-778185677715.s3.us-east-1.amazonaws.com/index.html" | head -10
+HTTP/1.1 403 Forbidden
+x-amz-request-id: JM6RYE6V6ZY91SS2
+x-amz-id-2: 3AVZisrfu7ixO2LiMgcZCjVkD6MsqKV1BlTjXcmGx3+fdSJnBuDyj5UFuDqPwxRQYT74VN15Ht8GvQ7VL3Mixq/5qyvvv2ia
+Content-Type: application/xml
+Transfer-Encoding: chunked
+Date: Sun, 01 Mar 2026 20:27:44 GMT
+Server: AmazonS3
+
+<?xml version="1.0" encoding="UTF-8"?>
+<Error><Code>AccessDenied</Code><Message>Access Denied</Message><RequestId>JM6RYE6V6ZY91SS2</RequestId><HostId>3AVZisrfu7ixO2LiMgcZCjVkD6MsqKV1BlTjXcmGx3+fdSJnBuDyj5UFuDqPwxRQYT74VN15Ht8GvQ7VL3Mixq/5qyvvv2ia</HostId></Error>
+
+
+aws s3api get-bucket-ownership-controls --bucket lab-static-778185677715
+{
+    "OwnershipControls": {
+        "Rules": [
+            {
+                "ObjectOwnership": "BucketOwnerPreferred"
+            }
+        ]
+    }
+}
+
+
+aws s3api get-bucket-policy --bucket lab-static-778185677715 --output text
+{"Version":"2012-10-17","Statement":[{"Sid":"AllowCloudFrontService","Effect":"Allow","Principal":{"Service":"cloudfront.amazonaws.com"},"Action":"s3:GetObject","Resource":"arn:aws:s3:::lab-static-778185677715/*"}]}
+
+
+
+#####
+
+ aws s3api put-bucket-policy --bucket lab-static-778185677715 --policy '{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Sid": "AllowCloudFrontOAC",
+    "Effect": "Allow",
+    "Principal": {"Service": "cloudfront.amazonaws.com"},
+    "Action": "s3:GetObject",
+    "Resource": "arn:aws:s3:::lab-static-778185677715/*",
+    "Condition": {
+      "StringEquals": {
+        "AWS:SourceArn": "arn:aws:cloudfront::778185677715:distribution/E3S9XAC2ISOB35"
+      }
+    }
+  }]
+}'
+
+ aws s3api put-public-access-block \
+  --bucket lab-static-778185677715 \
+  --public-access-block-configuration \
+  "BlockPublicAcls=true,IgnorePublicAcls=true,BlockPublicPolicy=true,RestrictPublicBuckets=true"
+
+
+ aws cloudfront create-invalidation \
+  --distribution-id E3S9XAC2ISOB35 \
+  --paths "/static/*"
+{
+    "Location": "https://cloudfront.amazonaws.com/2020-05-31/distribution/E3S9XAC2ISOB35/invalidation/IC1COBOGR6XBHY5VOITAEQWI27",
+    "Invalidation": {
+        "Id": "IC1COBOGR6XBHY5VOITAEQWI27",
+        "Status": "InProgress",
+        "CreateTime": "2026-03-01T20:31:21.464000+00:00",
+        "InvalidationBatch": {
+            "Paths": {
+                "Quantity": 1,
+                "Items": [
+                    "/static/*"
+                ]
+            },
+            "CallerReference": "cli-1772397081-565997"
+        }
+    }
+}
+
+ aws cloudfront get-invalidation \
+  --distribution-id E3S9XAC2ISOB35 \
+  --id IC1COBOGR6XBHY5VOITAEQWI27 \
+  --query "Invalidation.Status" --output text
+Completed
+
+curl -si https://thedawgs2025.click/static/index.html | head -10
+HTTP/1.1 403 Forbidden
+Content-Type: application/xml
+Transfer-Encoding: chunked
+Connection: keep-alive
+Server: AmazonS3
+Date: Sun, 01 Mar 2026 20:33:29 GMT
+X-Cache: Error from cloudfront
+Via: 1.1 3464dfd29ea725137a4e56a5b8387b30.cloudfront.net (CloudFront)
+X-Amz-Cf-Pop: DFW59-P6
+Alt-Svc: h3=":443"; ma=86400
+
+curl -si https://thedawgs2025.click/static/index.html | head -10
+HTTP/1.1 403 Forbidden
+Content-Type: application/xml
+Transfer-Encoding: chunked
+Connection: keep-alive
+Server: AmazonS3
+Date: Sun, 01 Mar 2026 20:34:10 GMT
+X-Cache: Error from cloudfront
+Via: 1.1 496a85635be885af91c839cfaadbbeb8.cloudfront.net (CloudFront)
+X-Amz-Cf-Pop: DFW59-P6
+Alt-Svc: h3=":443"; ma=86400
+
+#####
+
+aws cloudfront get-distribution-config --id E3S9XAC2ISOB35 \
+  --query "DistributionConfig.Origins.Items[?Id=='lab-s3-origin']" \
+  --output json
+[
+    {
+        "Id": "lab-s3-origin",
+        "DomainName": "lab-static-778185677715.s3.us-east-1.amazonaws.com",
+        "OriginPath": "",
+        "CustomHeaders": {
+            "Quantity": 0
+        },
+        "S3OriginConfig": {
+            "OriginAccessIdentity": "",
+            "OriginReadTimeout": 30
+        },
+        "ConnectionAttempts": 3,
+        "ConnectionTimeout": 10,
+        "OriginShield": {
+            "Enabled": false
+        },
+        "OriginAccessControlId": "E36LT7T1REB6J8"
+    }
+]
+
+aws cloudfront get-distribution-config --id E3S9XAC2ISOB35 \
+  --query "DistributionConfig.Origins.Items[?Id=='lab-s3-origin'].DomainName" \
+  --output text
+lab-static-778185677715.s3.us-east-1.amazonaws.com
+
+#####
+grep -n "s3_origin_config\|lab-s3-origin\|OriginAccessIdentity\|origin_access_control" cloudfront-lab-2a-distribution.tf | head -30
+185:resource "aws_cloudfront_origin_access_control" "dawgs-armageddon_oac_static01" {
+188:  origin_access_control_origin_type = "s3"
+269:    origin_access_control_id = aws_cloudfront_origin_access_control.dawgs-armageddon_oac_static01[0].id
+
+#####
+
+
+
+terraform plan -out=tfplan 2>&1 | tail -30
+aws_wafv2_web_acl_logging_configuration.dawgs-armageddon_waf_logging01[0]: Refreshing state... [id=arn:aws:wafv2:us-east-1:778185677715:regional/webacl/lab-waf01/d7905702-c4b4-4a6b-a18e-8b1f482f1ca1]
+aws_db_instance.dawgs-armageddon_rds01: Refreshing state... [id=db-IOLE7JTSPKUBAZ2XHJCUGSRRXM]
+aws_route.dawgs-armageddon_private_default_route: Refreshing state... [id=r-rtb-0b0d81ce9249dd3a41080289494]
+aws_s3_bucket_ownership_controls.dawgs-armageddon_static_owner01[0]: Refreshing state... [id=lab-static-778185677715]
+aws_cloudwatch_metric_alarm.dawgs-armageddon_alb_5xx_alarm01: Refreshing state... [id=lab-alb-5xx-alarm01]
+aws_lb_listener.dawgs-armageddon_https_listener01: Refreshing state... [id=arn:aws:elasticloadbalancing:us-east-1:778185677715:listener/app/lab-alb01/94629e54ff103afb/3485407a9877a5d0]
+aws_cloudwatch_dashboard.dawgs-armageddon_dashboard01: Refreshing state... [id=lab-dashboard01]
+aws_lb_listener.dawgs-armageddon_http_listener01: Refreshing state... [id=arn:aws:elasticloadbalancing:us-east-1:778185677715:listener/app/lab-alb01/94629e54ff103afb/a51000cb743f95f6]
+aws_wafv2_web_acl_association.dawgs-armageddon_waf_assoc01[0]: Refreshing state... [id=arn:aws:wafv2:us-east-1:778185677715:regional/webacl/lab-waf01/d7905702-c4b4-4a6b-a18e-8b1f482f1ca1,arn:aws:elasticloadbalancing:us-east-1:778185677715:loadbalancer/app/lab-alb01/94629e54ff103afb]
+aws_secretsmanager_secret_version.dawgs-armageddon_db_secret_version01: Refreshing state... [id=arn:aws:secretsmanager:us-east-1:778185677715:secret:lab/rds/mysql-0yicEM|terraform-20260301193219902300000001]
+aws_ssm_parameter.dawgs-armageddon_db_port_param: Refreshing state... [id=/lab/db/port]
+aws_ssm_parameter.dawgs-armageddon_db_endpoint_param: Refreshing state... [id=/lab/db/endpoint]
+aws_iam_policy.seir_gate_read_access: Refreshing state... [id=arn:aws:iam::778185677715:policy/lab-seir-gate-read-access]
+aws_lb_target_group_attachment.dawgs-armageddon_tg_attach01: Refreshing state... [id=arn:aws:elasticloadbalancing:us-east-1:778185677715:targetgroup/lab-tg01/f28a668d7d89cf36-2026030119064608090000000f]
+aws_lb_listener_rule.dawgs-armageddon_cf_origin_verify_rule[0]: Refreshing state... [id=arn:aws:elasticloadbalancing:us-east-1:778185677715:listener-rule/app/lab-alb01/94629e54ff103afb/3485407a9877a5d0/980da1b2d90c80f2]
+aws_lb_listener_rule.dawgs-armageddon_require_origin_header01: Refreshing state... [id=arn:aws:elasticloadbalancing:us-east-1:778185677715:listener-rule/app/lab-alb01/94629e54ff103afb/3485407a9877a5d0/72af93e040ff97fe]
+aws_lb_listener_rule.dawgs-armageddon_default_block01: Refreshing state... [id=arn:aws:elasticloadbalancing:us-east-1:778185677715:listener-rule/app/lab-alb01/94629e54ff103afb/3485407a9877a5d0/1ced502054a6bf61]
+aws_wafv2_web_acl_logging_configuration.dawgs-armageddon_cf_waf_logging01[0]: Refreshing state... [id=arn:aws:wafv2:us-east-1:778185677715:global/webacl/lab-cf-waf01/07e16f9d-a77e-42e1-bc25-4918f00f4712]
+aws_cloudfront_distribution.dawgs-armageddon_cf01[0]: Refreshing state... [id=E3S9XAC2ISOB35]
+aws_s3_bucket_policy.dawgs-armageddon_static_policy01[0]: Refreshing state... [id=lab-static-778185677715]
+aws_route53_record.dawgs-armageddon_cf_apex_alias[0]: Refreshing state... [id=Z0717862367KSPKDBWGDE_thedawgs2025.click_A]
+aws_route53_record.dawgs-armageddon_cf_app_alias[0]: Refreshing state... [id=Z0717862367KSPKDBWGDE_app.thedawgs2025.click_A]
+aws_route53_record.dawgs-armageddon_cf_apex_alias_aaaa[0]: Refreshing state... [id=Z0717862367KSPKDBWGDE_thedawgs2025.click_AAAA]
+aws_route53_record.dawgs-armageddon_cf_app_alias_aaaa[0]: Refreshing state... [id=Z0717862367KSPKDBWGDE_app.thedawgs2025.click_AAAA]
+aws_s3_object.dawgs-armageddon_static_user_data01[0]: Refreshing state... [id=lab-static-778185677715/user_data.sh]
+
+No changes. Your infrastructure matches the configuration.
+
+Terraform has compared your real infrastructure against your configuration
+and found no differences, so no changes are needed.
+
+
+terraform plan 2>&1 | grep -E "will be|must be|~ origin|s3_origin|OriginAccess" | head -20
+
+Jerome@BigDaddy MINGW64 ~/Documents/TheoWAF/class7/AWS/Terraform/1cbonusf-tf
+
+#####
+
+aws cloudfront get-distribution-config --id E3S9XAC2ISOB35 \
+  --query "DistributionConfig.Origins.Items[?Id=='lab-s3-origin']" \
+  --output json
+[
+    {
+        "Id": "lab-s3-origin",
+        "DomainName": "lab-static-778185677715.s3.us-east-1.amazonaws.com",
+        "OriginPath": "",
+        "CustomHeaders": {
+            "Quantity": 0
+        },
+        "S3OriginConfig": {
+            "OriginAccessIdentity": "",
+            "OriginReadTimeout": 30
+        },
+        "ConnectionAttempts": 3,
+        "ConnectionTimeout": 10,
+        "OriginShield": {
+            "Enabled": false
+        },
+        "OriginAccessControlId": "E36LT7T1REB6J8"
+    }
+]
+
+grep -n -A 20 "lab-s3-origin" cloudfront-lab-2a-distribution.tf | head -30
+
+Jerome@BigDaddy MINGW64 ~/Documents/TheoWAF/class7/AWS/Terraform/1cbonusf-tf
+
+#####
+
+ grep -rn "s3-origin\|s3_origin\|static.*origin\|origin.*static" *.tf | head -20
+cloudfront-lab-2a-distribution.tf:155:# Static content bucket for CloudFront /static/* origin
+cloudfront-lab-2a-distribution.tf:185:resource "aws_cloudfront_origin_access_control" "dawgs-armageddon_oac_static01" {
+cloudfront-lab-2a-distribution.tf:268:    origin_id                = "${var.project_name}-s3-origin"
+cloudfront-lab-2a-distribution.tf:269:    origin_access_control_id = aws_cloudfront_origin_access_control.dawgs-armageddon_oac_static01[0].id
+cloudfront-lab-2a-distribution.tf:337:  # ── Behavior 4: /static/* (aggressive caching — S3 origin) ─────────────
+cloudfront-lab-2a-distribution.tf:340:    target_origin_id       = "${var.project_name}-s3-origin"
+cloudfront-lab-2a-distribution.tf:347:    origin_request_policy_id   = aws_cloudfront_origin_request_policy.dawgs-armageddon_orp_static01.id
+lab2b_cache_correctness.tf:94:resource "aws_cloudfront_origin_request_policy" "dawgs-armageddon_orp_static01" {
+lab2b_cache_correctness.tf:148:#   target_origin_id       = "${var.project_name}-s3-origin01"  # was: -alb-origin01 (WRONG)
+lab2b_cache_correctness.tf:155:#   origin_request_policy_id   = aws_cloudfront_origin_request_policy.dawgs-armageddon_orp_static01.id
+static_asset.tf:12:#    S3 origin (dawgs-armageddon_static_bucket01).
+
+
+ grep -rn "aws_cloudfront_distribution" *.tf
+cloudfront-lab-2a-distribution.tf:210:          "AWS:SourceArn" = aws_cloudfront_distribution.dawgs-armageddon_cf01[0].arn
+cloudfront-lab-2a-distribution.tf:225:resource "aws_cloudfront_distribution" "dawgs-armageddon_cf01" {
+cloudfront-lab-2a-distribution.tf:496:    name                   = aws_cloudfront_distribution.dawgs-armageddon_cf01[0].domain_name
+cloudfront-lab-2a-distribution.tf:497:    zone_id                = aws_cloudfront_distribution.dawgs-armageddon_cf01[0].hosted_zone_id
+cloudfront-lab-2a-distribution.tf:501:  depends_on = [aws_cloudfront_distribution.dawgs-armageddon_cf01]
+cloudfront-lab-2a-distribution.tf:513:    name                   = aws_cloudfront_distribution.dawgs-armageddon_cf01[0].domain_name
+cloudfront-lab-2a-distribution.tf:514:    zone_id                = aws_cloudfront_distribution.dawgs-armageddon_cf01[0].hosted_zone_id
+cloudfront-lab-2a-distribution.tf:518:  depends_on = [aws_cloudfront_distribution.dawgs-armageddon_cf01]
+cloudfront-lab-2a-distribution.tf:531:    name                   = aws_cloudfront_distribution.dawgs-armageddon_cf01[0].domain_name
+cloudfront-lab-2a-distribution.tf:532:    zone_id                = aws_cloudfront_distribution.dawgs-armageddon_cf01[0].hosted_zone_id
+cloudfront-lab-2a-distribution.tf:536:  depends_on = [aws_cloudfront_distribution.dawgs-armageddon_cf01]
+cloudfront-lab-2a-distribution.tf:549:    name                   = aws_cloudfront_distribution.dawgs-armageddon_cf01[0].domain_name
+cloudfront-lab-2a-distribution.tf:550:    zone_id                = aws_cloudfront_distribution.dawgs-armageddon_cf01[0].hosted_zone_id
+cloudfront-lab-2a-distribution.tf:554:  depends_on = [aws_cloudfront_distribution.dawgs-armageddon_cf01]
+cloudfront-lab-2a-outputs.tf:9:  value       = var.enable_cloudfront ? aws_cloudfront_distribution.dawgs-armageddon_cf01[0].id : null
+cloudfront-lab-2a-outputs.tf:14:  value       = var.enable_cloudfront ? aws_cloudfront_distribution.dawgs-armageddon_cf01[0].domain_name : null        
+cloudfront-lab-2a-outputs.tf:19:  value       = var.enable_cloudfront ? aws_cloudfront_distribution.dawgs-armageddon_cf01[0].status : null
+cloudfront-lab-2a-outputs.tf:24:  value       = var.enable_cloudfront ? aws_cloudfront_distribution.dawgs-armageddon_cf01[0].arn : null
+cloudfront-lab-2a-outputs.tf:36:  value       = var.enable_cloudfront ? "https://${aws_cloudfront_distribution.dawgs-armageddon_cf01[0].domain_name}" : null
+cloudfront-lab-2a-outputs.tf:91:    aws_cloudfront_distribution.dawgs-armageddon_cf01[0].id,
+cloudfront-lab-2a-outputs.tf:104:  value       = var.enable_cloudfront ? aws_cloudfront_distribution.dawgs-armageddon_cf01[0].id : null
+lab2b_honors_plus_invalidation_action.tf:15:#         --distribution-id ${aws_cloudfront_distribution.dawgs-armageddon_cf01[0].id} \
+
+
+#####
+
+
+curl -si https://thedawgs2025.click/static/index.html | head -5
+HTTP/1.1 403 Forbidden
+Content-Type: application/xml
+Transfer-Encoding: chunked
+Connection: keep-alive
+Server: AmazonS3
+
+ # OAC ID in distribution
+aws cloudfront get-distribution-config --id E3S9XAC2ISOB35 \
+  --query "DistributionConfig.Origins.Items[?Id=='lab-static-778185677715-s3-origin' || Id=='lab-s3-origin'].OriginAccessControlId" \
+  --output text
+E36LT7T1REB6J8
+
+
+terraform state show 'aws_cloudfront_origin_access_control.dawgs-armageddon_oac_static01[0]' | grep " id "
+    id                                = "E36LT7T1REB6J8"
+
+
+#####
+
+ curl -si https://thedawgs2025.click/static/index.html | head -5
+HTTP/1.1 403 Forbidden
+Content-Type: application/xml
+Transfer-Encoding: chunked
+Connection: keep-alive
+Server: AmazonS3
+
+aws s3api get-bucket-policy --bucket lab-static-778185677715 --output text
+{"Version":"2012-10-17","Statement":[{"Sid":"AllowCloudFrontOAC","Effect":"Allow","Principal":{"Service":"cloudfront.amazonaws.com"},"Action":"s3:GetObject","Resource":"arn:aws:s3:::lab-static-778185677715/*","Condition":{"StringEquals":{"AWS:SourceArn":"arn:aws:cloudfront::778185677715:distribution/E3S9XAC2ISOB35"}}}]}
+
+#####
+
+# Step 1: Remove block public access
+aws s3api put-public-access-block \
+  --bucket lab-static-778185677715 \
+  --public-access-block-configuration \
+  "BlockPublicAcls=false,IgnorePublicAcls=false,BlockPublicPolicy=false,RestrictPublicBuckets=false"
+
+# Step 2: Make the object public
+aws s3api put-object-acl \
+  --bucket lab-static-778185677715 \
+  --key index.html \
+  --acl public-read
+
+# Step 3: Test directly
+curl -si "https://lab-static-778185677715.s3.us-east-1.amazonaws.com/index.html" | head -5
+
+# Step 4: Test through CloudFront
+curl -si https://thedawgs2025.click/static/index.html | head -5
+HTTP/1.1 403 Forbidden
+x-amz-request-id: 4XRQAG95JAEE87CW
+x-amz-id-2: S+05bvKH8XrjVY5spjI1c9t+JK6DFL3ORAmeiqV2h+BGax2V4Sa6VeR6R+2ZnvUPnlWi6/6qMGk=
+Content-Type: application/xml
+Transfer-Encoding: chunked
+HTTP/1.1 403 Forbidden
+Content-Type: application/xml
+Transfer-Encoding: chunked
+Connection: keep-alive
+Server: AmazonS3
+
+aws s3api get-bucket-ownership-controls --bucket lab-static-778185677715
+{
+    "OwnershipControls": {
+        "Rules": [
+            {
+                "ObjectOwnership": "BucketOwnerPreferred"
+            }
+        ]
+    }
+}
+
+
+ aws s3api head-object --bucket lab-static-778185677715 --key index.html
+{
+    "AcceptRanges": "bytes",
+    "LastModified": "2026-03-01T20:01:37+00:00",
+    "ContentLength": 53,
+    "ETag": "\"fe05b2050b867121c05ab9eb965931e7\"",
+    "ContentType": "text/html",
+    "ServerSideEncryption": "AES256",
+    "Metadata": {}
+}
+
+
+ aws s3api put-bucket-ownership-controls \
+  --bucket lab-static-778185677715 \
+  --ownership-controls '{"Rules":[{"ObjectOwnership":"ObjectWriter"}]}'
+
+aws s3 rm s3://lab-static-778185677715/index.html
+
+echo "<html><body><h1>thedawgs2025 - v1</h1></body></html>" > index.html
+
+aws s3 cp index.html s3://lab-static-778185677715/index.html \
+  --content-type text/html \
+  --acl public-read
+
+curl -si "https://lab-static-778185677715.s3.us-east-1.amazonaws.com/index.html" | head -5
+delete: s3://lab-static-778185677715/index.html
+upload: .\index.html to s3://lab-static-778185677715/index.html
+HTTP/1.1 200 OK
+x-amz-id-2: nt1eS1ajRvqRQTgstoQq7eYZ74/DpFfU0aszvPev6Cx/puqSXDTcC9XZUc09Y9qvDXxcgCcwvok=
+x-amz-request-id: CN8Q5SFBSW5S1SH2
+Date: Sun, 01 Mar 2026 21:16:45 GMT
+Last-Modified: Sun, 01 Mar 2026 21:16:44 GMT
+
+ curl -si https://thedawgs2025.click/static/index.html | head -10
+HTTP/1.1 403 Forbidden
+Content-Type: application/xml
+Transfer-Encoding: chunked
+Connection: keep-alive
+Server: AmazonS3
+Date: Sun, 01 Mar 2026 21:17:36 GMT
+X-Cache: Error from cloudfront
+Via: 1.1 007707e88c077a0f444161baef8e3dfa.cloudfront.net (CloudFront)
+X-Amz-Cf-Pop: DFW59-P6
+Alt-Svc: h3=":443"; ma=86400
+
+#####
+
+ aws s3api get-public-access-block --bucket lab-static-778185677715
+{
+    "PublicAccessBlockConfiguration": {
+        "BlockPublicAcls": false,
+        "IgnorePublicAcls": false,
+        "BlockPublicPolicy": false,
+        "RestrictPublicBuckets": false
+    }
+}
+
+ aws cloudfront get-distribution-config --id E3S9XAC2ISOB35 \
+  --query "DistributionConfig.CacheBehaviors.Items[?PathPattern=='/static/*'].TargetOriginId" \
+  --output text
+lab-s3-origin
+
+aws cloudfront get-distribution-config --id E3S9XAC2ISOB35 \
+  --query "DistributionConfig.Origins.Items[*].{ID:Id,Domain:DomainName}" \
+  --output table
+--------------------------------------------------------------------------
+|                          GetDistributionConfig                         |
++-----------------------------------------------------+------------------+
+|                       Domain                        |       ID         |
++-----------------------------------------------------+------------------+
+|  lab-alb01-1197784243.us-east-1.elb.amazonaws.com   |  lab-alb-origin  |
+|  lab-static-778185677715.s3.us-east-1.amazonaws.com |  lab-s3-origin   |
++-----------------------------------------------------+------------------+
+
+#####
+
+ aws s3api delete-bucket-policy --bucket lab-static-7781856777
+
+curl -si https://thedawgs2025.click/static/index.html | head -5
+HTTP/1.1 403 Forbidden
+Content-Type: application/xml
+Transfer-Encoding: chunked
+Connection: keep-alive
+
+#####
+
+ aws cloudfront create-invalidation \
+  --distribution-id E3S9XAC2ISOB35 \
+  --paths "/static/*" && \
+curl -si https://thedawgs2025.click/static/doesnotexist123.txt | head -5
+{
+    "Location": "https://cloudfront.amazonaws.com/2020-05-31/distribution/E3S9XAC2ISOB35/invalidation/I6JZO3EXO7O7QPW7P8AMFCO0XG",
+    "Invalidation": {
+        "Id": "I6JZO3EXO7O7QPW7P8AMFCO0XG",
+        "Status": "InProgress",
+        "CreateTime": "2026-03-01T21:31:13.803000+00:00",
+        "InvalidationBatch": {
+            "Paths": {
+                "Quantity": 1,
+                "Items": [
+                    "/static/*"
+                ]
+            },
+            "CallerReference": "cli-1772400674-579790"
+        }
+    }
+}
+
+HTTP/1.1 403 Forbidden
+Content-Type: application/xml
+Transfer-Encoding: chunked
+Connection: keep-alive
+Server: AmazonS3
+
+
+
+Server: AmazonS3
+
+
+ curl -si https://thedawgs2025.click/static/index.html | head -5
+curl -si https://thedawgs2025.click/static/doesnotexist123.txt | head -5
+HTTP/1.1 403 Forbidden
+Content-Type: application/xml
+Transfer-Encoding: chunked
+Connection: keep-alive
+Server: AmazonS3
+HTTP/1.1 403 Forbidden
+Content-Type: application/xml
+Transfer-Encoding: chunked
+Connection: keep-alive
+Server: AmazonS3
