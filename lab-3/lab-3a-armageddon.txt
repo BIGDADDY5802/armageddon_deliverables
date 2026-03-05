@@ -1,0 +1,247 @@
+#2026.3.4armageddon
+
+
+Step 1) Apply Sao_Paulo everything except the peering accepter
+
+
+terraform apply \
+  -var="tokyo_rds_endpoint=placeholder.rds.amazonaws.com" \
+  -var="tokyo_tgw_peering_attachment_id=tgw-attach-placeholder" \
+  -target=aws_ec2_transit_gateway.liberdade_tgw01 \
+  -target=aws_vpc.liberdade_vpc01 \
+  -target=aws_subnet.liberdade_public_subnets \
+  -target=aws_subnet.liberdade_private_subnets \
+  -target=aws_internet_gateway.liberdade_igw01 \
+  -target=aws_nat_gateway.liberdade_nat01 \
+  -target=aws_eip.liberdade_nat_eip01 \
+  -target=aws_route_table.liberdade_public_rt01 \
+  -target=aws_route_table.liberdade_private_rt01 \
+  -target=aws_route.liberdade_public_default_route \
+  -target=aws_route.liberdade_private_default_route \
+  -target=aws_route_table_association.liberdade_public_rta \
+  -target=aws_route_table_association.liberdade_private_rta \
+  -target=aws_ec2_transit_gateway_vpc_attachment.liberdade_attach_sp_vpc01
+
+
+
+liberdade_private_subnet_ids = [
+  "subnet-04c536e16f9bd1396",
+  "subnet-0d5fa18f9008babd9",
+]
+liberdade_public_subnet_ids = [
+  "subnet-0e1c7f2f59b516a1f",
+  "subnet-00120406ce8a529f3",
+]
+liberdade_tgw_attachment_id = "tgw-attach-0412176e018937492"
+liberdade_tgw_id = "tgw-0b1e0186e6739b3ad"
+liberdade_vpc_cidr = "10.190.0.0/16"
+liberdade_vpc_id = "vpc-0149f6b402e1f8a18"
+verify_tgw_route_command = "aws ec2 describe-route-tables --region sa-east-1 --filters Name=vpc-id,Values=vpc-0149f6b402e1f8a18 --query 'RouteTables[].Routes[]'"
+
+
+
+
+
+Tokyo: terraform apply
+
+
+ Error: creating EC2 Transit Gateway Route (tgw-rtb-03285ad872cf06269_10.190.0.0/16): operation error EC2: CreateTransitGatewayRoute, https response error StatusCode: 400, RequestID: fe289638-75c4-4fd6-b39a-8830b32cea4c, api error IncorrectState: tgw-attach-07eb47343780e7c46 is in invalid state
+│
+│   with aws_ec2_transit_gateway_route.tokyo_to_saopaulo,
+│   on tokyo_tgw.tf line 49, in resource "aws_ec2_transit_gateway_route" "tokyo_to_saopaulo":
+│   49: resource "aws_ec2_transit_gateway_route" "tokyo_to_saopaulo" {
+
+
+terraform apply -target=aws_ec2_transit_gateway_peering_attachment.shinjuku_to_liberdade_peer01
+aws_ec2_transit_gateway.shinjuku_tgw01: Refreshing state... [id=tgw-09ea670aac4789b8b]
+aws_ec2_transit_gateway_peering_attachment.shinjuku_to_liberdade_peer01: Refreshing state... [id=tgw-attach-07eb47343780e7c46]
+
+No changes. Your infrastructure matches the configuration.
+ Had to skip route for the moment. State is holding an old tgw_attach_id
+
+
+
+
+tokyo_alb_dns_name = "shinjuku-alb01-862975177.ap-northeast-1.elb.amazonaws.com"
+tokyo_ec2_instance_id = "i-073c9fb48ce0a8d1f"
+tokyo_log_group_name = "/aws/ec2/shinjuku-rds-app"
+tokyo_private_subnet_ids = [
+  "subnet-09835e89a243a25d0",
+  "subnet-024f6a22ed7a11a30",
+]
+tokyo_public_subnet_ids = [
+  "subnet-0feb6c5ec345098f2",
+  "subnet-057cb5840bdda5167",
+]
+tokyo_rds_endpoint = "shinjuku-rds01.c76yg4640twf.ap-northeast-1.rds.amazonaws.com"
+tokyo_sns_topic_arn = "arn:aws:sns:ap-northeast-1:778185677715:shinjuku-db-incidents"
+tokyo_tgw_id = "tgw-09ea670aac4789b8b"
+tokyo_tgw_peering_attachment_id = "tgw-attach-07eb47343780e7c46"
+tokyo_vpc_cidr = "10.52.0.0/16"
+tokyo_vpc_id = "vpc-0824b148cb925960c"
+verify_rds_in_tokyo_command = "aws rds describe-db-instances --region ap-northeast-1 --query 'DBInstances[].{DB:DBInstanceIdentifier,AZ:AvailabilityZone,Endpoint:Endpoint.Address}'"
+verify_tgw_attachment_command = "aws ec2 describe-transit-gateway-attachments --region ap-northeast-1 --filters Name=transit-gateway-id,Values=tgw-09ea670aac4789b8b"
+verify_tokyo_routes_command = "aws ec2 describe-route-tables --region ap-northeast-1 --filters Name=vpc-id,Values=vpc-0824b148cb925960c --query 'RouteTables[].Routes[]'"
+
+
+Back to SapPaulo:
+
+terraform apply -var="tokyo_tgw_peering_attachment_id=tgw-attach-07eb47343780e7c46" \
+		-var="tokyo_tgw_peering_attachment_id=tgw-attach-placeholder"
+
+
+
+liberdade_alb_dns_name = "liberdade-alb01-1984283115.sa-east-1.elb.amazonaws.com"
+liberdade_ec2_instance_id = "i-0f1a24b9c21877ffd"
+liberdade_log_group_name = "/aws/ec2/liberdade-app"
+liberdade_private_subnet_ids = [
+  "subnet-04c536e16f9bd1396",
+  "subnet-0d5fa18f9008babd9",
+]
+liberdade_public_subnet_ids = [
+  "subnet-0e1c7f2f59b516a1f",
+  "subnet-00120406ce8a529f3",
+]
+liberdade_sns_topic_arn = "arn:aws:sns:sa-east-1:778185677715:liberdade-incidents"
+liberdade_tgw_attachment_id = "tgw-attach-0412176e018937492"
+liberdade_tgw_id = "tgw-0b1e0186e6739b3ad"
+liberdade_vpc_cidr = "10.190.0.0/16"
+liberdade_vpc_id = "vpc-0149f6b402e1f8a18"
+verify_ec2_to_tokyo_rds = "aws ssm start-session --target i-0f1a24b9c21877ffd --region sa-east-1"
+verify_no_rds_command = "aws rds describe-db-instances --region sa-east-1 --query 'DBInstances[].DBInstanceIdentifier'"
+verify_tgw_route_command = "aws ec2 describe-route-tables --region sa-east-1 --filters Name=vpc-id,Values=vpc-0149f6b402e1f8a18 --query 'RouteTables[].Routes[]'"
+
+
+Back to Tokyo:
+
+terraform apply
+
+Apply complete! Resources: 1 added, 0 changed, 0 destroyed.
+
+Outputs:
+
+tokyo_alb_dns_name = "shinjuku-alb01-862975177.ap-northeast-1.elb.amazonaws.com"
+tokyo_ec2_instance_id = "i-073c9fb48ce0a8d1f"
+tokyo_log_group_name = "/aws/ec2/shinjuku-rds-app"
+tokyo_private_subnet_ids = [
+  "subnet-09835e89a243a25d0",
+  "subnet-024f6a22ed7a11a30",
+]
+tokyo_public_subnet_ids = [
+  "subnet-0feb6c5ec345098f2",
+  "subnet-057cb5840bdda5167",
+]
+tokyo_rds_endpoint = "shinjuku-rds01.c76yg4640twf.ap-northeast-1.rds.amazonaws.com"
+tokyo_sns_topic_arn = "arn:aws:sns:ap-northeast-1:778185677715:shinjuku-db-incidents"
+tokyo_tgw_id = "tgw-09ea670aac4789b8b"
+tokyo_tgw_peering_attachment_id = "tgw-attach-07eb47343780e7c46"
+tokyo_vpc_cidr = "10.52.0.0/16"
+tokyo_vpc_id = "vpc-0824b148cb925960c"
+verify_rds_in_tokyo_command = "aws rds describe-db-instances --region ap-northeast-1 --query 'DBInstances[].{DB:DBInstanceIdentifier,AZ:AvailabilityZone,Endpoint:Endpoint.Address}'"
+verify_tgw_attachment_command = "aws ec2 describe-transit-gateway-attachments --region ap-northeast-1 --filters Name=transit-gateway-id,Values=tgw-09ea670aac4789b8b"
+verify_tokyo_routes_command = "aws ec2 describe-route-tables --region ap-northeast-1 --filters Name=vpc-id,Values=vpc-0824b148cb925960c --query 'RouteTables[].Routes[]'"
+
+##Tokyo route is added. Now São Paulo needs to accept the peering and add its route:
+
+cd saopaulo
+terraform apply -var="tokyo_tgw_peering_attachment_id=tgw-attach-07eb47343780e7c46"
+
+
+Outputs:
+
+liberdade_alb_dns_name = "liberdade-alb01-1984283115.sa-east-1.elb.amazonaws.com"
+liberdade_ec2_instance_id = "i-0f1a24b9c21877ffd"
+liberdade_log_group_name = "/aws/ec2/liberdade-app"
+liberdade_private_subnet_ids = [
+  "subnet-04c536e16f9bd1396",
+  "subnet-0d5fa18f9008babd9",
+]
+liberdade_public_subnet_ids = [
+  "subnet-0e1c7f2f59b516a1f",
+  "subnet-00120406ce8a529f3",
+]
+liberdade_sns_topic_arn = "arn:aws:sns:sa-east-1:778185677715:liberdade-incidents"
+liberdade_tgw_attachment_id = "tgw-attach-0412176e018937492"
+liberdade_tgw_id = "tgw-0b1e0186e6739b3ad"
+liberdade_vpc_cidr = "10.190.0.0/16"
+liberdade_vpc_id = "vpc-0149f6b402e1f8a18"
+verify_ec2_to_tokyo_rds = "aws ssm start-session --target i-0f1a24b9c21877ffd --region sa-east-1"
+verify_no_rds_command = "aws rds describe-db-instances --region sa-east-1 --query 'DBInstances[].DBInstanceIdentifier'"
+verify_tgw_route_command = "aws ec2 describe-route-tables --region sa-east-1 --filters Name=vpc-id,Values=vpc-0149f6b402e1f8a18 --query 'RouteTables[].Routes[]'"
+
+
+
+#####
+
+verify peering is available:
+
+aws ec2 describe-transit-gateway-peering-attachments \
+  --region ap-northeast-1 \
+  --filters "Name=transit-gateway-attachment-id,Values=tgw-attach-07eb47343780e7c46"
+{
+    "TransitGatewayPeeringAttachments": [
+        {
+            "TransitGatewayAttachmentId": "tgw-attach-07eb47343780e7c46",
+            "RequesterTgwInfo": {
+                "TransitGatewayId": "tgw-09ea670aac4789b8b",
+                "OwnerId": "778185677715",
+                "Region": "ap-northeast-1"
+            },
+            "AccepterTgwInfo": {
+                "TransitGatewayId": "tgw-0b1e0186e6739b3ad",
+                "OwnerId": "778185677715",
+                "Region": "sa-east-1"
+            },
+            "Status": {
+                "Code": "available",
+                "Message": "Available"
+            },
+            "State": "available",
+            "CreationTime": "2026-03-05T01:19:45+00:00",
+            "Tags": [
+                {
+                    "Key": "Name",
+                    "Value": "shinjuku-to-liberdade-peer01"
+                }
+            ]
+        }
+    ]
+}
+
+#####
+
+
+available. Peering is solid.
+Now prove the path works:
+
+
+
+aws ssm start-session --target i-0f1a24b9c21877ffd --region sa-east-1
+
+
+Install netcat:
+
+sudo yum install -y nc
+
+
+ nc -zv shinjuku-rds01.c76yg4640twf.ap-northeast-1.rds.amazonaws.com 3306
+Ncat: Version 7.93 ( https://nmap.org/ncat )
+Ncat: Connected to 10.52.102.23:3306.
+Ncat: 0 bytes sent, 0 bytes received in 0.28 seconds.
+
+
+São Paulo EC2 reaching Tokyo RDS on port 3306 across two regions, through a TGW peering corridor, with no data residency in Brazil.
+
+
+Two TGWs in separate regions
+Cross-region peering attachment
+Static routes on both TGW route tables
+VPC routes pointing cross-region traffic at the TGW
+Security groups allowing the specific CIDR and port
+RDS stays in Tokyo. Compute connects from São Paulo.
+
+
+
+git add .
+git commit -m "update"
+git push -u origin main
