@@ -215,14 +215,22 @@ resource "aws_security_group" "liberdade_alb_sg01" {
   }
 }
 
-resource "aws_vpc_security_group_ingress_rule" "liberdade_alb_ingress_443" {
-  provider          = aws.saopaulo
+resource "aws_vpc_security_group_ingress_rule" "liberdade_alb_ingress_80" {
   security_group_id = aws_security_group.liberdade_alb_sg01.id
-  from_port         = 443
-  to_port           = 443
+  from_port         = 80
+  to_port           = 80
   ip_protocol       = "tcp"
-  cidr_ipv4         = "0.0.0.0/0" # TODO: tighten to CloudFront prefix list pl-id for sa-east-1
+  prefix_list_id    = data.aws_ec2_managed_prefix_list.cloudfront.id
 }
+
+# resource "aws_vpc_security_group_ingress_rule" "liberdade_alb_ingress_443" {
+#   provider          = aws.saopaulo
+#   security_group_id = aws_security_group.liberdade_alb_sg01.id
+#   from_port         = 443
+#   to_port           = 443
+#   ip_protocol       = "tcp"
+#   cidr_ipv4         = "0.0.0.0/0" # TODO: tighten to CloudFront prefix list pl-id for sa-east-1
+# }
 
 resource "aws_vpc_security_group_egress_rule" "liberdade_alb_egress_all" {
   provider          = aws.saopaulo
@@ -395,8 +403,12 @@ resource "aws_lb_listener" "liberdade_http_listener01" {
   protocol          = "HTTP"
 
   default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.liberdade_tg01.arn
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Forbidden"
+      status_code  = "403"
+    }
   }
 }
 

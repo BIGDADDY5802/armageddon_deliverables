@@ -1,0 +1,19 @@
+ python malgus_waf_summary.py --log-group aws-waf-logs-lab3
+{
+  "actions": [
+    {
+      "action": "ALLOW",
+      "hits": "33"
+    }
+  ],
+  "top_ips": [
+    {
+      "httpRequest.clientIp": "35.135.236.158",
+      "hits": "31"
+    },
+    {
+      "httpRequest.clientIp": "195.211.77.141",
+      "hits": "2"
+    }
+  ]
+}

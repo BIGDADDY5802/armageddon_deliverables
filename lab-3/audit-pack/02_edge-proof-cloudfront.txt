@@ -1,0 +1,25 @@
+ python malgus_cloudfront_log_explainer.py --bucket class-lab3-778185677715 --prefix Chwebacca-logs/
+Found 4 objects. Analyzing latest 3:
+  - s3://class-lab3-778185677715/Chwebacca-logs/EQUDJ3PPRYIZ.2026-03-09-01.1a5d1109.gz
+  - s3://class-lab3-778185677715/Chwebacca-logs/EQUDJ3PPRYIZ.2026-03-09-01.6db689c5.gz
+  - s3://class-lab3-778185677715/Chwebacca-logs/EQUDJ3PPRYIZ.2026-03-09-01.f0c4e121.gz
+
+=== CloudFront Cache Outcome Report (Standard Logs) ===
+Core total (Hit/Miss/RefreshHit): 2
+All counted lines/notes:          33
+
+Core outcomes:
+  Hit               0   (0.0% of core)
+  Miss              2   (100.0% of core)
+  RefreshHit        0   (0.0% of core)
+
+Other outcomes / parsing notes (top 20):
+  Other:Error                        30
+  Other:Redirect                      1
+
+Interpretation (ops):
+  • High Hit% usually means lower latency & lower origin load.
+  • High Miss% suggests caching policy mismatch, uncacheable headers,
+    query-string/cookie variance, or origin Cache-Control behavior.
+  • RefreshHit means CloudFront revalidated with origin and served cached content (often good).
+=======================================================

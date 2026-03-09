@@ -1,0 +1,13 @@
+ python malgus_residency_proof.py
+{
+  "tokyo_rds": [
+    {
+      "region": "ap-northeast-1",
+      "id": "shinjuku-rds01",
+      "az": "ap-northeast-1c",
+      "endpoint": "shinjuku-rds01.c76yg4640twf.ap-northeast-1.rds.amazonaws.com"
+    }
+  ],
+  "saopaulo_rds": [],
+  "assertion": "PASS"
+}

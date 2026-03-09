@@ -19,3 +19,13 @@ provider "aws" {
 provider "aws" {
   region = "sa-east-1"
 }
+
+# Tokyo provider alias — used only to read Secrets Manager secret
+# that was created in ap-northeast-1 by the Tokyo state.
+# Analogy: São Paulo needs to call Tokyo's locker room.
+# This is the phone line that makes that call possible.
+provider "aws" {
+  alias  = "tokyo"
+  region = "ap-northeast-1"
+}
+

@@ -232,20 +232,12 @@ resource "aws_security_group" "shinjuku_alb_sg01" {
   }
 }
 
-resource "aws_vpc_security_group_ingress_rule" "shinjuku_alb_ingress_443" {
-  security_group_id = aws_security_group.shinjuku_alb_sg01.id
-  from_port         = 443
-  to_port           = 443
-  ip_protocol       = "tcp"
-  cidr_ipv4         = "0.0.0.0/0" # TODO: tighten to CloudFront prefix list
-}
-
 resource "aws_vpc_security_group_ingress_rule" "shinjuku_alb_ingress_80" {
   security_group_id = aws_security_group.shinjuku_alb_sg01.id
   from_port         = 80
   to_port           = 80
   ip_protocol       = "tcp"
-  cidr_ipv4         = "0.0.0.0/0"
+  prefix_list_id    = data.aws_ec2_managed_prefix_list.cloudfront.id
 }
 
 resource "aws_vpc_security_group_egress_rule" "shinjuku_alb_egress_all" {
@@ -437,11 +429,19 @@ resource "aws_lb_listener" "shinjuku_http_listener01" {
   port              = 80
   protocol          = "HTTP"
 
+  # Default = 403. The listener rule in tokyo_origin_cloaking.tf
+  # fires first for requests carrying X-Chewbacca-Growl.
+  # Everything else — including direct ALB hits — gets blocked here.
   default_action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.shinjuku_tg01.arn
+    type = "fixed-response"
+    fixed_response {
+      content_type = "text/plain"
+      message_body = "Forbidden"
+      status_code  = "403"
+    }
   }
 }
+
 
 ############################################
 # Parameter Store

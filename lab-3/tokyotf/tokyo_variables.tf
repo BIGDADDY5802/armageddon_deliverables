@@ -31,7 +31,7 @@ variable "azs" {
 variable "ec2_ami_id" {
   description = "AMI ID for ap-northeast-1. Must be valid in Tokyo region."
   type        = string
-  default     = "ami-0d52744d6551d851e" # Amazon Linux 2 ap-northeast-1 — verify current
+  default     = "ami-088b486f20fab3f0e" # Amazon Linux 2023 ap-northeast-1
 }
 
 variable "ec2_instance_type" {
@@ -81,7 +81,7 @@ variable "my_ip" {
 variable "saopaulo_tgw_id" {
   description = "São Paulo TGW ID (liberdade_tgw01). Supplied after São Paulo first apply."
   type        = string
-  default = "tgw-0b1e0186e6739b3ad"
+  default = "tgw-06ccfdc693b07e688"
 }
 
 variable "saopaulo_vpc_cidr" {
@@ -89,3 +89,16 @@ variable "saopaulo_vpc_cidr" {
   type        = string
   default     = "10.190.0.0/16"
 }
+
+variable "saopaulo_alb_dns_name" {
+  description = "São Paulo ALB DNS name (liberdade-alb01). From São Paulo 3A outputs."
+  type        = string
+  default     = "liberdade-alb01-1045155915.sa-east-1.elb.amazonaws.com"
+}
+
+variable "saopaulo_alb_zone_id" {
+  description = "São Paulo ALB canonical hosted zone ID."
+  type        = string
+  default     = "Z2P70J7HTTTPLU"
+}
+

@@ -22,10 +22,10 @@ output "tokyo_tgw_id" {
   value       = aws_ec2_transit_gateway.shinjuku_tgw01.id
 }
 
-output "tokyo_tgw_peering_attachment_id" {
-  description = "Pass to São Paulo as var.tokyo_tgw_peering_attachment_id so it can accept the peering."
-  value       = aws_ec2_transit_gateway_peering_attachment.shinjuku_to_liberdade_peer01.id
-}
+# output "tokyo_tgw_peering_attachment_id" {
+#   description = "Pass to São Paulo as var.tokyo_tgw_peering_attachment_id so it can accept the peering."
+#   value       = aws_ec2_transit_gateway_peering_attachment.shinjuku_to_liberdade_peer01.id
+# }
 
 output "tokyo_rds_endpoint" {
   description = "Pass to São Paulo as var.tokyo_rds_endpoint. EC2 in SP connects here over TGW."
@@ -34,6 +34,10 @@ output "tokyo_rds_endpoint" {
 
 output "tokyo_alb_dns_name" {
   value = aws_lb.shinjuku_alb01.dns_name
+}
+
+output "tokyo_alb_zone_id" {
+  value = aws_lb.shinjuku_alb01.zone_id
 }
 
 output "tokyo_ec2_instance_id" {

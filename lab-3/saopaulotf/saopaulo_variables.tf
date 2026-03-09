@@ -76,5 +76,11 @@ variable "tokyo_db_name" {
 variable "tokyo_tgw_peering_attachment_id" {
   description = "TGW peering attachment ID initiated by Tokyo (shinjuku_to_liberdade_peer01)."
   type        = string
-  default     = "tgw-09ea670aac4789b8b" # Must be supplied after Tokyo TGW peering request is created
+  default     = "tgw-attach-03d4fd57d799ee664" # Must be supplied after Tokyo TGW peering request is created
+}
+
+variable "domain_name" {
+  description = "Primary domain for CloudFront distribution."
+  type        = string
+  default     = "thedawgs2025.click"
 }
