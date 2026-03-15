@@ -89,13 +89,3 @@ variable "tokyo_peering_attachment_ready" {
   type    = bool
   default = false
 }
-
-# variable "tokyo_peering_accepted" {
-#   type    = bool
-#   default = false
-# }
-
-# variable "tokyo_peering_ready" {
-#   type    = bool
-#   default = false
-# }

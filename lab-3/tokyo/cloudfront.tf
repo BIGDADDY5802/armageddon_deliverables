@@ -60,30 +60,6 @@ resource "aws_route53_record" "lab3_cf_cert_validation" {
   records         = [each.value.record]
 }
 
-
-
-#Explanation: Don't let CloudFront use the cert until ACM
-#confirms it's valid — otherwise the distribution deploy fails.
-# resource "aws_acm_certificate_validation" "lab3_cf_cert_validation" {
-#   provider                = aws.useast1
-#   certificate_arn         = aws_acm_certificate.lab3_cf_cert.arn
-#   validation_record_fqdns = [for r in aws_route53_record.lab3_cf_cert_validation : r.fqdn]
-# }
-
-############################################
-# Origin Header Secret (X-Chewbacca-Growl)
-#
-# Analogy: CloudFront whispers a secret password to the ALB.
-# The ALB only opens the door if it hears the right password.
-# Anyone who tries to hit the ALB directly (skipping CloudFront)
-# never knows the password and gets a 403.
-############################################
-
-# resource "random_password" "lab3b_origin_secret" {
-#   length  = 32
-#   special = false
-# }
-
 ############################################
 # CloudFront Distribution
 ############################################
@@ -251,11 +227,6 @@ resource "aws_cloudfront_distribution" "lab3_cf" {
   lifecycle {
     create_before_destroy = true
   }
-
-
-  # depends_on = [
-  #   aws_acm_certificate_validation.lab3_cf_cert_validation
-  # ]
 
   # CloudFront Standard Logging v2 — zero trust aligned.
   # Uses CloudFront's canonical user ID instead of a canned ACL.

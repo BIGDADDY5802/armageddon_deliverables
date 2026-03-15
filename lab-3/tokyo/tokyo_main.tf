@@ -170,10 +170,6 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "shinjuku_attach_tokyo_vpc01" 
 # Explanation: Tokyo initiates the peering request to São Paulo.
 # The São Paulo TGW ID comes from a variable — separate Terraform states
 # cannot reference each other's resources directly.
-# Apply order:
-#   1. Apply São Paulo → get liberdade_tgw_id
-#   2. Apply Tokyo with -var="saopaulo_tgw_id=<id>" → creates peering request
-#   3. Apply São Paulo again with peering attachment ID → accepts and completes corridor
 resource "aws_ec2_transit_gateway_peering_attachment" "shinjuku_to_liberdade_peer01" {
   count = var.saopaulo_tgw_ready ? 1 : 0
 

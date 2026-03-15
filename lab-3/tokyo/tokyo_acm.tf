@@ -85,20 +85,3 @@ resource "aws_route53_record" "origin_tokyo" {
     region = "ap-northeast-1"
   }
 }
-
-# resource "aws_route53_record" "origin_saopaulo" {
-#   zone_id        = data.aws_route53_zone.thedawgs_zone.zone_id
-#   name           = "origin.${var.domain_name}"
-#   type           = "A"
-#   set_identifier = "SaoPaulo-Latency-Target"
-
-#   alias {
-#     name                   = var.saopaulo_alb_dns_name
-#     zone_id                = var.saopaulo_alb_zone_id
-#     evaluate_target_health = true
-#   }
-
-#   latency_routing_policy {
-#     region = "sa-east-1"
-#   }
-# }

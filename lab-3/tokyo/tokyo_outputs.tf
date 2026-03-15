@@ -22,11 +22,6 @@ output "tokyo_tgw_id" {
   value       = aws_ec2_transit_gateway.shinjuku_tgw01.id
 }
 
-# output "tokyo_tgw_peering_attachment_id" {
-#   description = "Pass to São Paulo as var.tokyo_tgw_peering_attachment_id so it can accept the peering."
-#   value       = aws_ec2_transit_gateway_peering_attachment.shinjuku_to_liberdade_peer01.id
-# }
-
 output "tokyo_rds_endpoint" {
   description = "Pass to São Paulo as var.tokyo_rds_endpoint. EC2 in SP connects here over TGW."
   value       = aws_db_instance.shinjuku_rds01.address
@@ -68,9 +63,3 @@ output "verify_tokyo_routes_command" {
   description = "Auditor evidence: Tokyo private route table contains São Paulo CIDR via TGW."
   value       = "aws ec2 describe-route-tables --region ap-northeast-1 --filters Name=vpc-id,Values=${aws_vpc.shinjuku_vpc01.id} --query 'RouteTables[].Routes[]'"
 }
-
-# output "random_password" {
-#   description = "Random password generated"
-#   value       = random_password.lab3b_origin_secret.result
-#   sensitive   = true
-# }
