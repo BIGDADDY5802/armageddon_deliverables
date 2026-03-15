@@ -29,15 +29,37 @@
 ############################################
 
 data "aws_secretsmanager_secret" "lab3_origin_secret" {
+  count    = var.tokyo_peering_attachment_ready ? 1 : 0
   provider = aws.tokyo
   name     = "lab3/cloudfront/origin-secret"
 }
 
 data "aws_secretsmanager_secret_version" "lab3_origin_secret" {
+  count     = var.tokyo_peering_attachment_ready ? 1 : 0
   provider  = aws.tokyo
-  secret_id = data.aws_secretsmanager_secret.lab3_origin_secret.id
+  secret_id = data.aws_secretsmanager_secret.lab3_origin_secret[0].id
 }
 
 data "aws_ec2_managed_prefix_list" "cloudfront" {
   name = "com.amazonaws.global.cloudfront.origin-facing"
+}
+
+data "aws_ssm_parameter" "tokyo_tgw_peering_attachment_id" {
+  count    = var.tokyo_peering_attachment_ready ? 1 : 0
+  provider = aws.tokyo
+  name     = "/lab/shinjuku/tgw/peering-attachment-id"
+}
+
+data "aws_ssm_parameter" "tokyo_rds_endpoint" {
+  count    = var.tokyo_peering_attachment_ready ? 1 : 0
+  provider = aws.tokyo
+  name     = "/lab/tokyo/db/endpoint"
+}
+
+data "terraform_remote_state" "tokyo_state" {
+  backend = "local"
+
+  config = {
+    path = "./tokyo/terraform.tfstate"
+  }
 }

@@ -22,6 +22,7 @@ import logging
 from flask import Flask, request, make_response, jsonify
 from watchtower import CloudWatchLogHandler
 import datetime
+import hashlib
 
 # Tokyo is the data authority — all AWS service calls go to ap-northeast-1
 REGION = "ap-northeast-1"
@@ -170,14 +171,25 @@ def list_notes():
 
 @app.route("/api/public-feed")
 def public_feed():
-    data = {
-        "server_time_utc": datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "serving_region":  REGION,
-        "role":            "data-authority",
-        "message":         "Shinjuku — PHI stored here. Cached by CloudFront 30s."
+    stable = {
+        "serving_region": REGION,
+        "role":           "data-authority",
+        "message":        "Shinjuku — PHI stored here. Cached by CloudFront 30s."
     }
-    response = make_response(jsonify(data))
-    response.headers["Cache-Control"] = "public, s-maxage=30, max-age=0"
+    stable_body = json.dumps(stable, sort_keys=True)
+    etag = f'"{hashlib.md5(stable_body.encode()).hexdigest()}"'
+
+    if request.headers.get("If-None-Match") == etag:
+        return "", 304
+
+    stable["server_time_utc"] = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+    body = json.dumps(stable)
+
+    response = make_response(body)
+    response.headers["Content-Type"]    = "application/json"
+    response.headers["Cache-Control"]   = "public, s-maxage=60, max-age=30"
+    response.headers["ETag"]            = etag
+    response.headers["Last-Modified"]   = "Sat, 14 Mar 2026 00:00:00 GMT"
     return response
 
 if __name__ == "__main__":

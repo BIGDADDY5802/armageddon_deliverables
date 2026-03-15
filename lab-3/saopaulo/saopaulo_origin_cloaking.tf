@@ -47,6 +47,9 @@
 # X-Chewbacca-Growl correct → forward to app.
 # Missing or wrong → fall through to 403 default.
 resource "aws_lb_listener_rule" "liberdade_require_origin_header" {
+
+count        = var.tokyo_peering_attachment_ready ? 1 : 0
+
   provider     = aws.saopaulo
   listener_arn = aws_lb_listener.liberdade_http_listener01.arn
   priority     = 1
@@ -59,7 +62,7 @@ resource "aws_lb_listener_rule" "liberdade_require_origin_header" {
   condition {
     http_header {
       http_header_name = "X-Chewbacca-Growl"
-      values           = [data.aws_secretsmanager_secret_version.lab3_origin_secret.secret_string]
+      values = [data.aws_secretsmanager_secret_version.lab3_origin_secret[0].secret_string]
     }
   }
 }

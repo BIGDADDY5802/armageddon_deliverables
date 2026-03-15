@@ -68,3 +68,9 @@ output "verify_tokyo_routes_command" {
   description = "Auditor evidence: Tokyo private route table contains São Paulo CIDR via TGW."
   value       = "aws ec2 describe-route-tables --region ap-northeast-1 --filters Name=vpc-id,Values=${aws_vpc.shinjuku_vpc01.id} --query 'RouteTables[].Routes[]'"
 }
+
+# output "random_password" {
+#   description = "Random password generated"
+#   value       = random_password.lab3b_origin_secret.result
+#   sensitive   = true
+# }

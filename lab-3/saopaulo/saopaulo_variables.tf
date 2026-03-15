@@ -64,7 +64,7 @@ variable "tokyo_vpc_cidr" {
 variable "tokyo_rds_endpoint" {
   description = "Tokyo RDS endpoint hostname. EC2 app connects here over TGW."
   type        = string
-  default     = "shinjuku-rds01.c76yg4640twf.ap-northeast-1.rds.amazonaws.com" # Must be supplied from Tokyo outputs after Tokyo apply
+  default     = "" # Must be supplied from Tokyo outputs after Tokyo apply
 }
 
 variable "tokyo_db_name" {
@@ -76,7 +76,7 @@ variable "tokyo_db_name" {
 variable "tokyo_tgw_peering_attachment_id" {
   description = "TGW peering attachment ID initiated by Tokyo (shinjuku_to_liberdade_peer01)."
   type        = string
-  default     = "tgw-attach-03d4fd57d799ee664" # Must be supplied after Tokyo TGW peering request is created
+  default     = "tgw-attach-03ca3b04d1af88686" # Must be supplied after Tokyo TGW peering request is created
 }
 
 variable "domain_name" {
@@ -84,3 +84,18 @@ variable "domain_name" {
   type        = string
   default     = "thedawgs2025.click"
 }
+
+variable "tokyo_peering_attachment_ready" {
+  type    = bool
+  default = false
+}
+
+# variable "tokyo_peering_accepted" {
+#   type    = bool
+#   default = false
+# }
+
+# variable "tokyo_peering_ready" {
+#   type    = bool
+#   default = false
+# }

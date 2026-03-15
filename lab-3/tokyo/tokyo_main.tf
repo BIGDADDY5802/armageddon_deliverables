@@ -104,7 +104,7 @@ resource "aws_route" "shinjuku_public_default_route" {
 }
 
 resource "aws_route_table_association" "shinjuku_public_rta" {
-  count          = length(aws_subnet.shinjuku_public_subnets)
+  count = 2
   subnet_id      = aws_subnet.shinjuku_public_subnets[count.index].id
   route_table_id = aws_route_table.shinjuku_public_rt01.id
 }
@@ -135,7 +135,7 @@ resource "aws_route" "shinjuku_to_sp_route01" {
 }
 
 resource "aws_route_table_association" "shinjuku_private_rta" {
-  count          = length(aws_subnet.shinjuku_private_subnets)
+  count = 2
   subnet_id      = aws_subnet.shinjuku_private_subnets[count.index].id
   route_table_id = aws_route_table.shinjuku_private_rt01.id
 }
@@ -175,12 +175,14 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "shinjuku_attach_tokyo_vpc01" 
 #   2. Apply Tokyo with -var="saopaulo_tgw_id=<id>" → creates peering request
 #   3. Apply São Paulo again with peering attachment ID → accepts and completes corridor
 resource "aws_ec2_transit_gateway_peering_attachment" "shinjuku_to_liberdade_peer01" {
+  count = var.saopaulo_tgw_ready ? 1 : 0
+
   transit_gateway_id      = aws_ec2_transit_gateway.shinjuku_tgw01.id
   peer_region             = "sa-east-1"
-  peer_transit_gateway_id = var.saopaulo_tgw_id
+  peer_transit_gateway_id = data.aws_ssm_parameter.liberdade_tgw_id[0].value
 
   tags = {
-    Name = "shinjuku-to-liberdade-peer01"
+    Name = "${local.name_prefix}-peer01"
   }
 }
 
@@ -451,6 +453,7 @@ resource "aws_ssm_parameter" "shinjuku_db_endpoint_param" {
   name  = "/lab/tokyo/db/endpoint"
   type  = "String"
   value = aws_db_instance.shinjuku_rds01.address
+  overwrite = true
 
   tags = {
     Name = "${local.name_prefix}-param-db-endpoint"
@@ -475,6 +478,20 @@ resource "aws_ssm_parameter" "shinjuku_db_name_param" {
   tags = {
     Name = "${local.name_prefix}-param-db-name"
   }
+}
+
+resource "aws_ssm_parameter" "tgw_peering_attachment_id" {
+  count = var.saopaulo_tgw_ready ? 1 : 0
+
+  name  = "/lab/${local.name_prefix}/tgw/peering-attachment-id"
+  type  = "String"
+  value = aws_ec2_transit_gateway_peering_attachment.shinjuku_to_liberdade_peer01[0].id
+}
+
+resource "aws_ssm_parameter" "tokyo_rds_endpoint" {
+  name  = "/lab/tokyo/db/endpoint"
+  type  = "String"
+  value = "aws_db_instance.${local.name_prefix}.endpoint"
 }
 
 ############################################

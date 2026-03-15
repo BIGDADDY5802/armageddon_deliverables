@@ -81,7 +81,7 @@ variable "my_ip" {
 variable "saopaulo_tgw_id" {
   description = "São Paulo TGW ID (liberdade_tgw01). Supplied after São Paulo first apply."
   type        = string
-  default = "tgw-06ccfdc693b07e688"
+  default = "tgw-03056c836846496d5"
 }
 
 variable "saopaulo_vpc_cidr" {
@@ -93,12 +93,21 @@ variable "saopaulo_vpc_cidr" {
 variable "saopaulo_alb_dns_name" {
   description = "São Paulo ALB DNS name (liberdade-alb01). From São Paulo 3A outputs."
   type        = string
-  default     = "liberdade-alb01-1045155915.sa-east-1.elb.amazonaws.com"
+  default     = ""
 }
 
 variable "saopaulo_alb_zone_id" {
   description = "São Paulo ALB canonical hosted zone ID."
   type        = string
-  default     = "Z2P70J7HTTTPLU"
+  default     = ""
 }
 
+variable "saopaulo_tgw_ready" {
+  type    = bool
+  default = false
+}
+
+variable "tokyo_peering_accepted" {
+  type    = bool
+  default = false
+}

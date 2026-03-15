@@ -259,14 +259,14 @@ resource "aws_ec2_transit_gateway" "liberdade_tgw01" {
 # Explanation: Accept the peering request initiated by Tokyo (Shinjuku).
 # Acceptance is explicit — permissions are never assumed.
 resource "aws_ec2_transit_gateway_peering_attachment_accepter" "liberdade_accept_peer01" {
-  provider                      = aws.saopaulo
-  transit_gateway_attachment_id = var.tokyo_tgw_peering_attachment_id
+  count = var.tokyo_peering_attachment_ready ? 1 : 0
+
+  transit_gateway_attachment_id = data.aws_ssm_parameter.tokyo_tgw_peering_attachment_id[0].value
 
   tags = {
     Name = "${local.name_prefix}-accept-peer01"
   }
 }
-
 # Explanation: Attach São Paulo VPC to the local TGW so EC2 traffic can enter the corridor.
 resource "aws_ec2_transit_gateway_vpc_attachment" "liberdade_attach_sp_vpc01" {
   provider           = aws.saopaulo
@@ -279,11 +279,13 @@ resource "aws_ec2_transit_gateway_vpc_attachment" "liberdade_attach_sp_vpc01" {
   }
 }
 
-resource "aws_ec2_transit_gateway_route" "saopaulo_to_tokyo" {
+ resource "aws_ec2_transit_gateway_route" "saopaulo_to_tokyo" {
+ count = var.tokyo_peering_attachment_ready ? 1 : 0
+
   provider                       = aws.saopaulo
   destination_cidr_block         = var.tokyo_vpc_cidr
   transit_gateway_route_table_id = aws_ec2_transit_gateway.liberdade_tgw01.association_default_route_table_id
-  transit_gateway_attachment_id  = aws_ec2_transit_gateway_peering_attachment_accepter.liberdade_accept_peer01.id
+  transit_gateway_attachment_id = aws_ec2_transit_gateway_peering_attachment_accepter.liberdade_accept_peer01[0].id
 }
 
 ############################################
@@ -420,10 +422,13 @@ resource "aws_lb_listener" "liberdade_http_listener01" {
 # so the app can discover it without hardcoding. Credentials come from
 # the Tokyo Secrets Manager replica (or passed as env vars).
 resource "aws_ssm_parameter" "liberdade_tokyo_db_endpoint_param" {
+
+count    = var.tokyo_peering_attachment_ready ? 1 : 0
+
   provider = aws.saopaulo
   name     = "/lab/tokyo/db/endpoint"
   type     = "String"
-  value    = var.tokyo_rds_endpoint
+  value    = data.aws_ssm_parameter.tokyo_rds_endpoint[0].value
 
   tags = {
     Name = "${local.name_prefix}-param-tokyo-db-endpoint"
@@ -438,6 +443,16 @@ resource "aws_ssm_parameter" "liberdade_tokyo_db_port_param" {
 
   tags = {
     Name = "${local.name_prefix}-param-tokyo-db-port"
+  }
+}
+
+resource "aws_ssm_parameter" "liberdade_tgw_id" {
+  name  = "/lab/${local.name_prefix}/tgw/id"
+  type  = "String"
+  value = aws_ec2_transit_gateway.liberdade_tgw01.id
+
+  tags = {
+    Name = "${local.name_prefix}-param-tgw-id"
   }
 }
 

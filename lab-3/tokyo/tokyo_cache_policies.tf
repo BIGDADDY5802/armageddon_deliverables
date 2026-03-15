@@ -94,22 +94,16 @@ resource "aws_cloudfront_cache_policy" "lab3_cache_api_disabled" {
 
 resource "aws_cloudfront_origin_request_policy" "lab3_orp_api" {
   name    = "lab3-orp-api"
-  comment = "Forward cookies, query strings, and key headers to ALB origins (Tokyo + São Paulo)"
+  comment = "Forward cookies, query strings, and key headers to ALB origins (Tokyo + Sao Paulo)"
 
-  # Forward all cookies — session/auth tokens must reach the app.
   cookies_config { cookie_behavior = "all" }
 
-  # Forward all query strings — /api/list?page=2 must reach the app unchanged.
   query_strings_config { query_string_behavior = "all" }
 
   headers_config {
     header_behavior = "whitelist"
     headers {
-      # Content-Type: so the app knows if it's JSON or a form post.
-      # Origin: for CORS validation.
-      # Host: so the app knows which domain is being requested.
-      # Authorization removed — session cookies handle auth in this app.
-      items = ["Content-Type", "Origin", "Host"]
+      items = ["Content-Type", "Origin", "Host", "If-None-Match", "If-Modified-Since"]
     }
   }
 }
@@ -156,5 +150,28 @@ resource "aws_cloudfront_response_headers_policy" "lab3_rsp_static" {
       # immutable    = tell browser: don't revalidate even on refresh
       value = "public, max-age=31536000, immutable"
     }
+  }
+}
+
+resource "aws_cloudfront_cache_policy" "lab3_cache_public_feed" {
+  name    = "lab3-cache-public-feed"
+  comment = "30s TTL with ETag revalidation support for /api/public-feed RefreshHit"
+
+  default_ttl = 30
+  max_ttl     = 60
+  min_ttl     = 0
+
+  parameters_in_cache_key_and_forwarded_to_origin {
+    cookies_config {
+      cookie_behavior = "none"
+    }
+    query_strings_config {
+      query_string_behavior = "none"
+    }
+    headers_config {
+      header_behavior = "none"
+    }
+    enable_accept_encoding_gzip   = true
+    enable_accept_encoding_brotli = true
   }
 }
