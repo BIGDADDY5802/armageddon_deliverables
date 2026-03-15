@@ -385,6 +385,3 @@ You are close to enterprise-grade, but the public EC2 exposure would be flagged 
 ---
 
 **End of Report**
-
-```
-```
