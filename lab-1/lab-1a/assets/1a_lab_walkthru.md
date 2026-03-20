@@ -736,12 +736,12 @@ aws secretsmanager describe-secret \
 ### 1. Screenshots Required
 
 - RDS security group inbound rule showing source = `lab-ec2-sg01`
-![](/attachments/security-group.png)
+![](/attachments2/security-group.png)
 - EC2 instance with IAM role attached
-![](/attachments/instance-role-attached.png)
+![](/attachments2/instance-role-attached.png)
 - `/list` endpoint output showing at least 3 notes
-![](/attachments/olidip.png)
-![](/attachments/newip.png)
+![](/attachments2/olidip.png)
+![](/attachments2/newip.png)
 
 Find in deliverables.md
 
