@@ -10,16 +10,16 @@ Capture clear evidence of your setup:
 🔐 RDS Security Group Rule
 
 Must show inbound rule with source = lab-ec2-sg01
-![](/attachments/security-group.png)
+![](/attachments2/security-group.png)
 
 🖥️ EC2 Instance with IAM Role
-![](/attachments/instance-role-attached.png)
+![](/attachments2/instance-role-attached.png)
 Confirm the instance has the correct IAM role attached
 
 
 📝 /list Endpoint Output
-![](/attachments/olidip.png)
-![](/attachments/newip.png)
+![](/attachments2/olidip.png)
+![](/attachments2/newip.png)
 Show at least 3 notes returned from your application
 
 
