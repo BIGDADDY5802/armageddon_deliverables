@@ -1,362 +1,325 @@
-# Lab Security Review — EC2, Security Groups, RDS, and Secrets
+Lab Security Review — EC2, Security Groups, RDS, and Secrets
 
-**Environment:** us-east-1  
-**Account:** 778185677715  
-**Date:** 2026-02-24  
+Environment: us-east-1
+Account: REDACTED
+Date: 2026-02-24
 
 This document provides a comprehensive technical assessment of the current architecture, validates security posture, and explains key design decisions in employer-credible language.
 
----
+🧭 Executive Summary
 
-# 🧭 Executive Summary
+Your environment demonstrates a partially hardened cloud pattern with strong controls around:
 
-Your environment demonstrates a **partially hardened cloud pattern** with strong controls around:
+Private RDS
 
-- Private RDS
-- IAM-scoped secret access
-- IMDSv2 enforcement
-- Encryption at rest
+IAM-scoped secret access
 
-However, the EC2 instance is still **publicly exposed via SSH and HTTP**, which would not pass most production security reviews.
+IMDSv2 enforcement
 
-**Overall posture:** ⚠️ Mixed (Good data-layer security, weak edge posture)
+Encryption at rest
 
----
+However, the EC2 instance is still publicly exposed via SSH and HTTP, which would not pass most production security reviews.
 
-# 🖥️ EC2 Instance Analysis
+Overall posture: ⚠️ Mixed (Good data-layer security, weak edge posture)
 
-## Instance Identity
+🖥️ EC2 Instance Analysis
+Instance Identity
+Attribute	Value
+Instance ID	REDACTED
+Name	lab-ec2-app
+Type	t3.micro
+State	running
+AZ	us-east-1a
+🌐 Network Exposure
+Public Interface
+Property	Value
+Public IP	REDACTED
+Public DNS	REDACTED
+Private IP	REDACTED
+Subnet	REDACTED
+🚨 Security Assessment
 
-| Attribute | Value |
-|----------|-------|
-| Instance ID | i-0d38fc923280ebb68 |
-| Name | lab-ec2-app |
-| Type | t3.micro |
-| State | running |
-| AZ | us-east-1a |
-
----
-
-## 🌐 Network Exposure
-
-### Public Interface
-
-| Property | Value |
-|--------|-------|
-| Public IP | **3.231.93.117** |
-| Public DNS | ec2-3-231-93-117.compute-1.amazonaws.com |
-| Private IP | 10.180.1.145 |
-| Subnet | subnet-0d28bd34e9f2d296e |
-
-### 🚨 Security Assessment
-
-**This instance is publicly reachable from the internet.**
+This instance is publicly reachable from the internet.
 
 Implications:
 
-- Internet scanners can reach the host
-- SSH brute-force attempts likely
-- Increases attack surface
-- Not aligned with modern zero-trust patterns
+Internet scanners can reach the host
 
----
+SSH brute-force attempts likely
 
-# 🔐 Instance Security Group Review
+Increases attack surface
 
-## Security Group
+Not aligned with modern zero-trust patterns
 
-| Field | Value |
-|------|-------|
-| Name | armageddon-public-sg |
-| ID | sg-01a0f1bc58d478430 |
-| VPC | vpc-013c423ca14ee628e |
+🔐 Instance Security Group Review
+Security Group
+Field	Value
+Name	armageddon-public-sg
+ID	REDACTED
+VPC	REDACTED
+Inbound Rules
+Port	Protocol	Source	Description	Risk
+80	TCP	0.0.0.0/0	homepage	⚠️ Public
+22	TCP	0.0.0.0/0	secure-shell	🚨 High
+🔴 Critical Finding
 
----
-
-## Inbound Rules
-
-| Port | Protocol | Source | Description | Risk |
-|------|----------|--------|------------|------|
-| 80 | TCP | 0.0.0.0/0 | homepage | ⚠️ Public |
-| 22 | TCP | 0.0.0.0/0 | secure-shell | 🚨 High |
-
-### 🔴 Critical Finding
-
-**SSH is open to the entire internet.**
+SSH is open to the entire internet.
 
 This is one of the most commonly exploited misconfigurations in cloud environments.
 
----
+Outbound Rules
+Protocol	Destination
+All (-1)	0.0.0.0/0
 
-## Outbound Rules
+Status: Standard default — acceptable in most architectures.
 
-| Protocol | Destination |
-|---------|-------------|
-| All (-1) | 0.0.0.0/0 |
+🗄️ RDS Instance Review
+Database Identity
+Property	Value
+Identifier	lab-mysql
+Engine	MySQL 8.4.7
+Class	db.m7g.large
+Port	3306
+Multi-AZ	false
+🔒 Network Security
+Public Exposure
+Setting	Value
+PubliclyAccessible	false ✅
 
-**Status:** Standard default — acceptable in most architectures.
+Result: Database is private.
 
----
-
-# 🗄️ RDS Instance Review
-
-## Database Identity
-
-| Property | Value |
-|---------|-------|
-| Identifier | lab-mysql |
-| Engine | MySQL 8.4.7 |
-| Class | db.m7g.large |
-| Port | 3306 |
-| Multi-AZ | false |
-
----
-
-## 🔒 Network Security
-
-### Public Exposure
-
-| Setting | Value |
-|--------|-------|
-| PubliclyAccessible | **false** ✅ |
-
-**Result:** Database is private.
-
----
-
-## Subnet Placement
+Subnet Placement
 
 RDS subnet group:
 
-- subnet-030784edc268424b3 (us-east-1a)
-- subnet-0963e454eb1bc66a8 (us-east-1b)
+REDACTED (us-east-1a)
 
-**Status:** Proper multi-AZ subnet placement.
+REDACTED (us-east-1b)
 
----
+Status: Proper multi-AZ subnet placement.
 
-## Encryption
+Encryption
+Control	Status
+Storage encrypted	✅
+KMS key	Present
+Performance Insights	Enabled
+CloudWatch exports	Enabled
 
-| Control | Status |
-|--------|--------|
-| Storage encrypted | ✅ |
-| KMS key | Present |
-| Performance Insights | Enabled |
-| CloudWatch exports | Enabled |
+Assessment: Strong data-layer posture.
 
-**Assessment:** Strong data-layer posture.
+🔐 IAM Role and Secrets Access
+Attached Policy
 
----
+get_secrets_secret_manager
 
-# 🔐 IAM Role and Secrets Access
+Purpose: Allow EC2 workload to retrieve database credentials securely.
 
-## Attached Policy
-
-- get_secrets_secret_manager
-
-**Purpose:** Allow EC2 workload to retrieve database credentials securely.
-
----
-
-## Secret Metadata
-
-| Field | Value |
-|------|-------|
-| Name | lab/rds/mysql |
-| Rotation | Not shown |
-| Last changed | 2026-01-05 |
-| Last accessed | 2026-01-14 |
-
----
-
-## ✅ Why Secrets Manager Is Superior
+Secret Metadata
+Field	Value
+Name	lab/rds/mysql
+Rotation	Not shown
+Last changed	REDACTED
+Last accessed	REDACTED
+✅ Why Secrets Manager Is Superior
 
 Using managed secrets provides:
 
-- Centralized secret lifecycle
-- Fine-grained IAM authorization
-- Audit visibility
-- Encryption at rest
-- Runtime retrieval
-- Rotation capability
+Centralized secret lifecycle
 
-### ❌ Problems With Hardcoding
+Fine-grained IAM authorization
+
+Audit visibility
+
+Encryption at rest
+
+Runtime retrieval
+
+Rotation capability
+
+❌ Problems With Hardcoding
 
 If credentials were in:
 
-- user-data  
-- environment variables  
-- source code  
+user-data
+
+environment variables
+
+source code
 
 You would lose:
 
-- rotation agility  
-- auditability  
-- blast-radius control  
-- secure storage guarantees  
+rotation agility
 
----
+auditability
 
-# 🧠 Concept Questions (Validated)
+blast-radius control
 
-## A) Why is DB inbound source restricted to the EC2 security group?
+secure storage guarantees
 
-**Correct reasoning.**
+🧠 Concept Questions (Validated)
+A) Why is DB inbound source restricted to the EC2 security group?
+
+Correct reasoning.
 
 Security group referencing:
 
-- Enforces least privilege
-- Prevents arbitrary network access
-- Limits lateral movement
-- Uses stateful connection tracking
+Enforces least privilege
 
-### Security Impact
+Prevents arbitrary network access
+
+Limits lateral movement
+
+Uses stateful connection tracking
+
+Security Impact
 
 If the EC2 is compromised:
 
-- attacker still cannot directly access DB from elsewhere
-- lateral movement is constrained
-- blast radius is reduced
+attacker still cannot directly access DB from elsewhere
 
-✅ This is the **industry-preferred pattern**
+lateral movement is constrained
 
----
+blast radius is reduced
 
-## B) What port does MySQL use?
+✅ This is the industry-preferred pattern
 
-**Answer:** 3306 ✅
+B) What port does MySQL use?
 
----
+Answer: 3306 ✅
 
-## C) Why is Secrets Manager better than storing creds in code/user-data?
+C) Why is Secrets Manager better than storing creds in code/user-data?
 
 Your explanation is technically sound.
 
-### Key Advantages
+Key Advantages
 
 Secrets Manager provides:
 
-- Encryption with KMS
-- IAM-based authorization
-- API retrieval
-- Versioning
-- Optional rotation
-- Audit trails
+Encryption with KMS
 
-**Verdict:** Correct and interview-ready.
+IAM-based authorization
 
----
+API retrieval
 
-# 🔐 Least-Privilege Analysis
+Versioning
 
-## Why broader access is forbidden
+Optional rotation
+
+Audit trails
+
+Verdict: Correct and interview-ready.
+
+🔐 Least-Privilege Analysis
+Why broader access is forbidden
 
 Allowing wide Secrets Manager access would:
 
-- Increase credential exfiltration risk
-- Expand blast radius
-- Violate least privilege
-- Enable lateral discovery attacks
+Increase credential exfiltration risk
 
-**This restriction is correct and necessary.**
+Expand blast radius
 
----
+Violate least privilege
 
-## Why the role exists
+Enable lateral discovery attacks
+
+This restriction is correct and necessary.
+
+Why the role exists
 
 The IAM role:
 
-- Enables runtime secret retrieval
-- Avoids hardcoded credentials
-- Supports secure workload identity
-- Enables future rotation
+Enables runtime secret retrieval
 
-**Design quality:** Good
+Avoids hardcoded credentials
 
----
+Supports secure workload identity
 
-## Why it can read this secret
+Enables future rotation
 
-Because the identity policy explicitly grants:
+Design quality: Good
 
+Why it can read this secret
 
+Because the identity policy explicitly grants appropriate access to the specific secret resource.
 
-for the matching secret ARN.
+This is proper resource-scoped authorization.
 
-This is proper **resource-scoped authorization**.
-
----
-
-## Why it cannot read others
+Why it cannot read others
 
 Because the policy scope is narrow.
 
 This enforces:
 
-- tenant isolation
-- credential boundary control
-- least privilege
+tenant isolation
 
-**This is exactly what security reviewers want to see.**
+credential boundary control
 
----
+least privilege
 
-# 🚨 Top Security Findings
+This is exactly what security reviewers want to see.
 
-## Critical
+🚨 Top Security Findings
+Critical
 
-- SSH open to internet (0.0.0.0/0)
-- Instance has public IP
+SSH open to internet (0.0.0.0/0)
 
-## Medium
+Instance has public IP
 
-- Single-AZ RDS (availability concern)
-- No evidence of secret rotation
+Medium
 
-## Low
+Single-AZ RDS (availability concern)
 
-- Wide egress (usually acceptable)
-- Monitoring disabled on EC2
+No evidence of secret rotation
 
----
+Low
 
-# 🛠️ Recommended Hardening (Production Grade)
+Wide egress (usually acceptable)
 
-## Immediate (High Impact)
+Monitoring disabled on EC2
 
-- Remove public IP from EC2
-- Remove port 22 from internet
-- Use SSM Session Manager only
-- Move instance to private subnet
+🛠️ Recommended Hardening (Production Grade)
+Immediate (High Impact)
 
-## Strongly Recommended
+Remove public IP from EC2
 
-- Enable secret rotation
-- Enable EC2 detailed monitoring
-- Consider Multi-AZ RDS
-- Add VPC Flow Logs
-- Add CloudWatch agent
+Remove port 22 from internet
 
-## Elite-Level Improvements
+Use SSM Session Manager only
 
-- Add WAF in front of ALB
-- Use private ALB + CloudFront
-- Implement SCP guardrails
-- Add GuardDuty
-- Add Inspector
+Move instance to private subnet
 
----
+Strongly Recommended
 
-# 🏁 Final Verdict
+Enable secret rotation
 
-**Data layer:** ✅ Strong  
-**Identity model:** ✅ Good  
-**Edge exposure:** 🚨 Needs improvement  
+Enable EC2 detailed monitoring
 
-You are **very close to enterprise-ready**, but the public EC2 exposure would be flagged in a real security review.
+Consider Multi-AZ RDS
 
----
+Add VPC Flow Logs
 
-# 💬 Interview-Ready One-Liner
+Add CloudWatch agent
 
-> “The database tier is fully private and IAM-scoped via Secrets Manager; next step is removing direct internet exposure from the compute layer and enforcing SSM-only access.”
+Elite-Level Improvements
+
+Add WAF in front of ALB
+
+Use private ALB + CloudFront
+
+Implement SCP guardrails
+
+Add GuardDuty
+
+Add Inspector
+
+🏁 Final Verdict
+
+Data layer: ✅ Strong
+Identity model: ✅ Good
+Edge exposure: 🚨 Needs improvement
+
+You are very close to enterprise-ready, but the public EC2 exposure would be flagged in a real security review.
+
+💬 Interview-Ready One-Liner
+
+“The database tier is fully private and IAM-scoped via Secrets Manager; next step is removing direct internet exposure from the compute layer and enforcing SSM-only access.”
